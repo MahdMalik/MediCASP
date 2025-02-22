@@ -11,7 +11,7 @@ CORS(app)  # Enable CORS for all routes
 @app.route('/api/backend', methods=['POST'])
 def process_data():
     queryPhrase = request.get_json()
-    file_path = "C:/Users/mahd/Documents/hackreason2024autism/testLogic.pl"
+    file_path = "C:/Users/mahd/Documents/MediCASP/testLogic.pl"
     # Open the file in append mode ('a')
     with open(file_path, 'a') as file:
         file.write("\n?- " + queryPhrase)

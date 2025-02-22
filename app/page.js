@@ -98,7 +98,7 @@ export default function Home() {
   async function sendQuery(query) {
     try
     {
-      const returnedValues = await fetch('/api/backend', {
+      const returnedValues = await fetch('http://localhost:5000/api/backend', {
         method: 'POST',
         headers: {'Content-Type': 'application/json',},
         body: JSON.stringify(query)
