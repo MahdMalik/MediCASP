@@ -151,5 +151,25 @@ export async function POST(req)
     const sendMessage = await theChat.sendMessage(messages[messages.length - 1].parts[0].text)
     const response = sendMessage.response
     const text = response.text()
-    return NextResponse.json({autismStatus: text.substring(0, text.indexOf("}") + 1), message: text.substring(text.indexOf("}") + 1)});
+    const status = text.substring(0, text.indexOf("}") + 1)
+    const query = status.substring(status.indexOf("has_autism"), status.length - 1)
+    let queryResults = ""
+    if(text.indexOf("true") == 1)
+    {
+      //do post function
+      try
+      {
+        const returnedValues = await fetch('http://localhost:5000/api/backend', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify(query)
+        })
+        queryResults = await returnedValues.json()
+      }
+      catch(e)
+      {
+        console.log("Failed to contact python. Error: " + e + " this was the query btw: " + query)
+      }
+    }
+    return NextResponse.json({autismStatus: status, message: text.substring(text.indexOf("}") + 1), queryResult: queryResults});
 }

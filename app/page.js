@@ -24,8 +24,8 @@ export default function Home() {
   }]);
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [queryResults, setQueryResults] = useState("")
   const [showCoverPage, setShowCoverPage] = useState(true);
+  const [addedResultLine, setResults] = useState("")
 
   // Ref for the chat box
   const chatBoxRef = useRef(null);
@@ -45,6 +45,7 @@ export default function Home() {
 
 
   const sendMessage = async() => {
+    console.log("Current line: "  + addedResultLine)
     if (!message.trim()) return;
 
     setMessages((prevMessages) => [
@@ -55,39 +56,39 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      let additionalLine = ""
-      if(queryResults.length != 0)
-      {
-        if(queryResults.indexOf("no models") != -1)
-        {
-          additionalLine = "{SCREENING RESULTS: NO AUTISM}"
-        }
-        else
-        {
-          
-          const searchForPhrase = "Y = "
-          const pointOfY = queryResults.indexOf(searchForPhrase)
-          const severityLevel = parseInt(queryResults.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
-          console.log(queryResults.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1))
-          additionalLine = "{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}"
-        }
-        setQueryResults("")
-      }
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {'Content-Type': "application/json"},
-        body: JSON.stringify([...messages, {role: "user", parts: [{text: additionalLine + "\n" + message}]}])
+        body: JSON.stringify([...messages, {role: "user", parts: [{text: addedResultLine + "\n" + message}]}])
       });
       const data = await response.json();
       setMessages((prevMessages) => [
         ...prevMessages,
         {role: "model", parts: [{text: data.message}]}
       ]);
-      if(data.autismStatus.indexOf("true") != -1)
+      if(data.autismStatus.indexOf("has_autism") == -1)
       {
-        console.log("john query: " + data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
-        sendQuery(data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
+        console.log("HELP IN GAIA")
       }
+      console.log("john query: " + data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
+      if(data.queryResult.length != 0)
+      {
+        setResults("")
+        console.log("query result: " + data.queryResult)
+        if(data.queryResult.indexOf("no models") != -1)
+        {
+          setResults("{SCREENING RESULTS: NO AUTISM}") 
+        }
+        else
+        {
+          
+          const searchForPhrase = "Y = "
+          const pointOfY = data.queryResult.indexOf(searchForPhrase)
+          const severityLevel = parseInt(data.queryResult.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
+          setResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+        }
+      }
+
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
@@ -95,24 +96,6 @@ export default function Home() {
     }
   };
 
-  async function sendQuery(query) {
-    try
-    {
-      const returnedValues = await fetch('http://localhost:5000/api/backend', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json',},
-        body: JSON.stringify(query)
-      })
-      const returnedQuery = await returnedValues.json()
-      setQueryResults(returnedQuery)
-      console.log(returnedQuery)
-    }
-    catch(e)
-    {
-      console.log("Failed to contact python. Error: " + e)
-    }
-    
-  }
   return (
     <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
       {/* coverpage */}
@@ -179,7 +162,7 @@ export default function Home() {
                       mb={2}
                     >
                       {message.role === "model" && (
-                        <Avatar src="/logo.png"  alt="Logo" sx={{ bgcolor: 'primary.main', mr: 1 }}>B</Avatar>
+                        <Avatar alt="Logo" sx={{ bgcolor: 'primary.main', mr: 1 }}>B</Avatar>
                       )}
                       <Box 
                         bgcolor={message.role === 'model' ? 'primary.light' : 'secondary.light'} 
