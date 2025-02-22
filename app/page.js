@@ -98,7 +98,7 @@ export default function Home() {
   async function sendQuery(query) {
     try
     {
-      const returnedValues = await fetch('https://0gtpj1hhqk.execute-api.us-east-2.amazonaws.com/IDontKnowWhatStagesAre/callLinuxServer', {
+      const returnedValues = await fetch('/api/backend', {
         method: 'POST',
         headers: {'Content-Type': 'application/json',},
         body: JSON.stringify(query)
@@ -133,31 +133,12 @@ export default function Home() {
         }}
         onClick={() => setShowCoverPage(false)}
         >
-          <Image
-            src="/coverLogo.png"
-            alt="Enter Site"
-            width={700}
-            height={700}
-            style={{ objectFit: 'contain' }}
-          />
       </Box>
     )}
     {/* Rest of JSX */}
   
       <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
       {/* Background Image */}
-      <Image 
-        src="/Autism_Awareness.png" 
-        alt="Background" 
-        layout="fill"
-        objectFit="cover"
-        quality={100}
-        style={{ 
-          zIndex: -1,  // Ensures image is behind other content
-          opacity: 0.4 // Makes background slightly transparent
-        }}
-      />
-        
         <ThemeProvider theme={theme}>
           <Box sx={{
             position: 'fixed',
