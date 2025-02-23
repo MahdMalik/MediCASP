@@ -175,6 +175,10 @@ export default function Home() {
         console.log("Speech Recognition Not Available")
         return;
     }
+
+    // Stop any ongoing speech before new recording
+    synthRef.current?.cancel();
+
     setIsListening(true);
     recognitionRef.current = new webkitSpeechRecognition();
     recognitionRef.current.continuous = false;
