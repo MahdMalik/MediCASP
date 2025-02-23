@@ -96,4 +96,8 @@ moderate_ra(X) :-
 
 severe_ra(X) :-
     has_rheumatoid_arthritis(X),
+<<<<<<< HEAD
     count_symptoms(X, 7).
+=======
+    count_symptoms(X, 7).
+>>>>>>> c82581674118f0541699773aa3a3a5a6fdb71569
