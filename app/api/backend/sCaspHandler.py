@@ -16,9 +16,12 @@ def process_data():
     if(queryPhrase.find("autism") != -1):
         file_path = "C:/Users/mahd/Documents/MediCASP/autism.pl"
         fileToCall = "autism.pl"
-    else:
+    elif(queryPhrase.find("dementia") != -1):
         file_path = "C:/Users/mahd/Documents/MediCASP/dementia.pl"
         fileToCall = "dementia.pl"
+    elif(queryPhrase.find("has_ra") != -1):
+        file_path = "C:/Users/mahd/Documents/MediCASP/arthritis.pl"
+        fileToCall = "arthritis.pl"
     # Open the file in append mode ('a')
     with open(file_path, 'a') as file:
         file.write("\n?- " + queryPhrase)

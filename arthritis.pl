@@ -96,8 +96,16 @@ moderate_ra(X) :-
 
 severe_ra(X) :-
     has_rheumatoid_arthritis(X),
-<<<<<<< HEAD
     count_symptoms(X, 7).
-=======
-    count_symptoms(X, 7).
->>>>>>> c82581674118f0541699773aa3a3a5a6fdb71569
+
+has_ra(X, Y) :-
+    Y = severe, severe_ra(X).
+
+has_ra(X, Y) :-
+    Y = moderate, moderate_ra(X).
+
+has_ra(X, Y) :-
+    Y = mild, mild_ra(X).
+?- has_ra([joint_swelling, small_joint_involvement, symmetric_arthritis, not_positive_rf, positive_acpa, not_elevated_crp, elevated_esr, symptom_duration], Y).
+?- has_ra([joint_swelling, small_joint_involvement, symmetric_arthritis, positive_rf, positive_acpa, elevated_crp, elevated_esr, symptom_duration], Y).
+?- has_ra([joint_swelling, small_joint_involvement, symmetric_arthritis, positive_rf, positive_acpa, elevated_crp, elevated_esr, symptom_duration], Y).

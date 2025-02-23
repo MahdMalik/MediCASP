@@ -49,6 +49,7 @@ export default function Home() {
   //These variables store the results of our queries that we have sent out.
   const [autismResultLine, setAutismResults] = useState("")
   const [dementiaResultLine, setDementiaResults] = useState("")
+  const [arthritisResultLine, setArthritisResults] = useState("")
 
   // Ref for the chat box
   const chatBoxRef = useRef(null);
@@ -96,10 +97,11 @@ export default function Home() {
     {
       setAutismResults("")
       setDementiaResults("")
+      setArthritisResults("")
       for(const oneQuery of queries)
       {
         console.log("query results: " + oneQuery)
-        if(oneQuery.indexOf("no models") != -1)
+        if(oneQuery.indexOf("no models") != -1 || oneQuery == "no.")
         {
           if(oneQuery.indexOf("has_autism") != -1)
           {
@@ -108,6 +110,10 @@ export default function Home() {
           else if(oneQuery.indexOf("has_dementia") != -1)
           {
             setDementiaResults("{SCREENING RESULTS: NO DEMENTIA}") 
+          }
+          else if(oneQuery.indexOf("has_ra") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO ARTHRITIS}") 
           }
         }
         else
@@ -125,13 +131,18 @@ export default function Home() {
             const severityLevel = oneQuery.substring(startPoint, startPoint + 6)
             setDementiaResults("{SCREENING RESULTS: POSSIBLE DEMENTIA. SEVERITY LEVEL: " + severityLevel + "}")
           }
+          else if(oneQuery.indexOf("has_ra") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, oneQuery.length - 1)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE ARTHRITIS. SEVERITY LEVEL: " + severityLevel + "}")
+          }
         }
       }
     }
   }
 
   const sendMessage = async() => {
-    console.log("Current autism line: "  + autismResultLine)
     //don't send empty messages
     if (!message.trim()) return;
     //add it to the messages array
@@ -146,13 +157,15 @@ export default function Home() {
     //try to get AI's response
     try {
       //reponse stores AIs' response.
+      const trueUserMessage = autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + message
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 'Content-Type': "application/json" },
-        body: JSON.stringify([...messages, {role: "user", parts: [{text: autismResultLine + "\n" + dementiaResultLine + "\n" + message}]}])
+        body: JSON.stringify([...messages, {role: "user", parts: [{text: trueUserMessage}]}])
       });
       setAutismResults("")
       setDementiaResults("")
+      setArthritisResults("")
       const data = await response.json();
       //add the ai's message to the history
       setMessages((prevMessages) => [
@@ -320,7 +333,7 @@ export default function Home() {
                   </IconButton>
                 </Stack>
                 <Typography fontStyle="italic" sx={{ pt: 1, color: '#808080', textAlign: 'center' }}>
-                  This bot is designed to provide insights into a patients case of autism, it does not replace a real doctor!
+                  This bot is designed to provide insights into a patients case of medical conditions, it does not replace a real doctor!
                 </Typography>
               </Box>
             </Stack>
