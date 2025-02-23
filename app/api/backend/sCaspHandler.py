@@ -11,14 +11,21 @@ CORS(app)  # Enable CORS for all routes
 @app.route('/api/backend', methods=['POST'])
 def process_data():
     queryPhrase = request.get_json()
-    file_path = "C:/Users/mahd/Documents/MediCASP/autism.pl"
+    file_path = ""
+    fileToCall = ""
+    if(queryPhrase.find("autism") != -1):
+        file_path = "C:/Users/mahd/Documents/MediCASP/autism.pl"
+        fileToCall = "autism.pl"
+    else:
+        file_path = "C:/Users/mahd/Documents/MediCASP/dementia.pl"
+        fileToCall = "dementia.pl"
     # Open the file in append mode ('a')
     with open(file_path, 'a') as file:
         file.write("\n?- " + queryPhrase)
 
     try:
         call = subprocess.Popen(
-            ["wsl", "/home/mahd/.ciao/build/bin/scasp",  "autism.pl"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, 
+            ["wsl", "/home/mahd/.ciao/build/bin/scasp",  fileToCall], stdin=subprocess.PIPE, stdout=subprocess.PIPE, 
             text=True, universal_newlines=True
             )
         output, err = call.communicate(timeout=10800)

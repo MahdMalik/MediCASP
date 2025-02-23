@@ -25,7 +25,9 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showCoverPage, setShowCoverPage] = useState(true);
-  const [addedResultLine, setResults] = useState("")
+  //These variables store the results of our queries that we have sent out.
+  const [autismResultLine, setAutismResults] = useState("")
+  const [dementiaResultLine, setDementiaResults] = useState("")
 
   // Ref for the chat box
   const chatBoxRef = useRef(null);
@@ -43,50 +45,53 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
-
+  //function to send a message to the chatbot.
   const sendMessage = async() => {
-    console.log("Current line: "  + addedResultLine)
+    console.log("Current autism line: "  + autismResultLine)
+    //don't send empty messages
     if (!message.trim()) return;
-
+    //add it to the messages array
     setMessages((prevMessages) => [
       ...prevMessages,
       {role: "user", parts: [{text: message}]},
     ]);
+    //reset message
     setMessage('');
+    //show AI is typing
     setIsTyping(true);
-
+    //try to get AI's response
     try {
+      //reponse stores AIs' response.
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {'Content-Type': "application/json"},
-        body: JSON.stringify([...messages, {role: "user", parts: [{text: addedResultLine + "\n" + message}]}])
+        body: JSON.stringify([...messages, {role: "user", parts: [{text: autismResultLine + "\n" + dementiaResultLine + "\n" + message}]}])
       });
       const data = await response.json();
+      //add the ai's message to the history
       setMessages((prevMessages) => [
         ...prevMessages,
         {role: "model", parts: [{text: data.message}]}
       ]);
-      if(data.autismStatus.indexOf("has_autism") == -1)
-      {
-        console.log("HELP IN GAIA")
-      }
-      console.log("john query: " + data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
+      console.log("john query: " + data.conditionStatus)
+      //if there was a query returned.
       if(data.queryResult.length != 0)
       {
-        setResults("")
-        console.log("query result: " + data.queryResult)
-        if(data.queryResult.indexOf("no models") != -1)
+        setAutismResults("")
+        setDementiaResults("")
+        for(const oneQuery of data.queryResult)
         {
-          setResults("{SCREENING RESULTS: NO AUTISM}") 
-        }
-        
-        else
-        {
-          
-          const searchForPhrase = "Y = "
-          const pointOfY = data.queryResult.indexOf(searchForPhrase)
-          const severityLevel = parseInt(data.queryResult.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
-          setResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+          if(oneQuery.indexOf("no models") != -1)
+          {
+            setAutismResults("{SCREENING RESULTS: NO AUTISM}") 
+          }
+          else
+          {
+            const searchForPhrase = "Y = "
+            const pointOfY = oneQuery.indexOf(searchForPhrase)
+            const severityLevel = parseInt(oneQuery.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
+            setAutismResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+          }
         }
       }
 
