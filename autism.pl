@@ -81,4 +81,10 @@ level_three(X) :-
     non_verbal_comm_deficits(X),
     rel_maintenance_deficits(X),
     restricted_patterns_behaviours(X, Count),
+<<<<<<< HEAD
     Count = 4.
+?- has_autism([social_emotional_deficits,non_verbal_comm_deficits,rel_maintenance_deficits,motor_stereotypes,rigid_behaviour_patterns,highly_perseverative_interests,hyper_hyporeactivity], Y).
+?- has_autism([], Y).
+=======
+    Count = 4.
+>>>>>>> d115cf5428e6f0d9c69afdf9f1f69ce605713a89

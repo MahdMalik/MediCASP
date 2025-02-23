@@ -1,31 +1,51 @@
 'use client'
+
 import Image from 'next/image';
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  Box, Stack, TextField, Button, Typography, Avatar, 
-  createTheme, ThemeProvider, Fade, IconButton, CircularProgress 
+import {
+  Box, Stack, TextField, Button, Typography, Avatar, AppBar, Toolbar,
+  createTheme, ThemeProvider, Fade, IconButton, CircularProgress,
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 
+// Import your logo
+import logo from '../public/logoV2.png'; // public pathway
+import logo2 from '../public/logoV1.png'; // public pathway
+
+// Theme customization based on logo colors
+const logoColor = '#39FF14'; // This is green, dominant color in the logo
 const theme = createTheme({
   palette: {
-    primary: { main: '#02023a' },
-    secondary: { main: '#00C850' },
-    background: { default: '#f5f5f5', paper: '#ffffff' },
+    primary: {
+      main: '#02023a', // Dark blue, also in the logo
+      contrastText: '#fff',  // White text for contrast
+    },
+    secondary: {
+      main: '#00C850',  // Lighter green, also in the logo
+      contrastText: '#000', // Black text for contrast
+    },
+    background: {
+      default: '#f5f5f5',
+      paper: '#ffffff',
+    },
+  },
+  typography: {
+    fontFamily: 'Roboto, sans-serif',
   },
 });
 
-const quickReplies = ["I'd like a screening" , "I think I have symptoms for autism", "I have a question", "I think I have symptoms for dementia"];
+const quickReplies = ["I'd like a screening", "I think I have symptoms for autism", "I have a question", "I think I have symptoms for dementia"];
 
 export default function Home() {
   const [messages, setMessages] = useState([{
     role: "model",
-    parts: [{text: "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started. "}]
+    parts: [{ text: "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started. " }]
   }]);
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showCoverPage, setShowCoverPage] = useState(true);
   const [addedResultLine, setResults] = useState("")
+  const [coverPageOpacity, setCoverPageOpacity] = useState(1);
 
   // Ref for the chat box
   const chatBoxRef = useRef(null);
@@ -43,14 +63,37 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (showCoverPage) {
+      const timeoutId = setTimeout(() => {
+        // Fade out effect
+        let opacity = 1;
+        const fadeOutInterval = setInterval(() => {
+          opacity -= 0.05; // Adjust the fade speed here
+          setCoverPageOpacity(opacity);
+          if (opacity <= 0) {
+            clearInterval(fadeOutInterval);
+            setShowCoverPage(false); // Fully hide the cover page
+          }
+        }, 50); // Update opacity every 50ms
+      }, 1000); // Wait for 1 second before fading
+      const handleKeyPress = () => setShowCoverPage(false); // Hide on keypress
+      window.addEventListener('keydown', handleKeyPress);
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('keydown', handleKeyPress);
+      };
+    }
+    setCoverPageOpacity(1); // Reset opacity when cover page shows
+  }, [showCoverPage]);
 
-  const sendMessage = async() => {
-    console.log("Current line: "  + addedResultLine)
+  const sendMessage = async () => {
+    console.log("Current line: " + addedResultLine)
     if (!message.trim()) return;
 
     setMessages((prevMessages) => [
       ...prevMessages,
-      {role: "user", parts: [{text: message}]},
+      { role: "user", parts: [{ text: message }] },
     ]);
     setMessage('');
     setIsTyping(true);
@@ -58,34 +101,31 @@ export default function Home() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {'Content-Type': "application/json"},
-        body: JSON.stringify([...messages, {role: "user", parts: [{text: addedResultLine + "\n" + message}]}])
+        headers: { 'Content-Type': "application/json" },
+        body: JSON.stringify([...messages, { role: "user", parts: [{ text: addedResultLine + "\n" + message }] }])
       });
       const data = await response.json();
       setMessages((prevMessages) => [
         ...prevMessages,
-        {role: "model", parts: [{text: data.message}]}
+        { role: "model", parts: [{ text: data.message }] }
       ]);
-      if(data.autismStatus.indexOf("has_autism") == -1)
-      {
+      if (data.autismStatus.indexOf("has_autism") == -1) {
         console.log("HELP IN GAIA")
       }
       console.log("john query: " + data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
-      if(data.queryResult.length != 0)
-      {
+      if (data.queryResult.length != 0) {
         setResults("")
         console.log("query result: " + data.queryResult)
-        if(data.queryResult.indexOf("no models") != -1)
-        {
-          setResults("{SCREENING RESULTS: NO AUTISM}") 
+        if (data.queryResult.indexOf("no models") != -1) {
+          setResults("{SCREENING RESULTS: NO AUTISM}")
         }
-        else
-        {
-          
+
+        else {
+
           const searchForPhrase = "Y = "
           const pointOfY = data.queryResult.indexOf(searchForPhrase)
           const severityLevel = parseInt(data.queryResult.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
-          setResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+          setResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}")
         }
       }
 
@@ -99,36 +139,62 @@ export default function Home() {
   return (
     <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
       {/* coverpage */}
-    {showCoverPage && (
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#000',
-          zIndex: 9999,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          cursor: 'pointer',
-        }}
-        onClick={() => setShowCoverPage(false)}
+      {showCoverPage && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#020221',
+            zIndex: 9999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+            opacity: coverPageOpacity,
+            transition: 'opacity 0.2s ease-in-out' // Add transition for smooth fade
+          }}
+          onClick={() => setShowCoverPage(false)}
         >
-      </Box>
-    )}
-    {/* Rest of JSX */}
-  
+          <Image
+            src="/logoV1.png"
+            alt="Enter Site"
+            width={850}
+            height={850}
+            style={{ objectFit: 'contain' }}
+          />
+        </Box>
+      )}
+      {/* Rest of JSX */}
+
       <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      {/* Background Image */}
+        {/* navibar */}
+        <ThemeProvider theme={theme}>
+          <AppBar position="static">
+            <Toolbar>
+              <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
+                MediCASP
+              </Typography>
+              <Button color="inherit" href="/" sx={{ ml: 2 }}>
+                Home
+              </Button>
+              <Button color="inherit" href="/about" sx={{ ml: 2 }}>
+                About
+              </Button>
+            </Toolbar>
+          </AppBar>
+        </ThemeProvider>
+
+        {/* Background Image */}
         <ThemeProvider theme={theme}>
           <Box sx={{
             position: 'fixed',
-            top: "4%",
+            top: "12%",
             left: "5%",
             width: "90%",
-            height: "90%",
+            height: "83%",
             borderRadius: 2,
             boxShadow: 3,
             overflow: 'hidden',
@@ -142,7 +208,7 @@ export default function Home() {
                 color: 'white',
               }}>
                 <Typography variant="h6" fontWeight="600">
-                  MediCASP Bot
+                  MediBot
                 </Typography>
               </Box>
 
@@ -152,20 +218,20 @@ export default function Home() {
                 overflow: 'auto',
                 p: 2,
               }}
-              ref={chatBoxRef} // Attach ref to chat box
+                ref={chatBoxRef} // Attach ref to chat box
               >
                 {messages.map((message, index) => (
                   <Fade key={index} in={true} timeout={500}>
-                    <Box 
-                      display="flex" 
+                    <Box
+                      display="flex"
                       justifyContent={message.role === "model" ? 'flex-start' : 'flex-end'}
                       mb={2}
                     >
                       {message.role === "model" && (
-                        <Avatar alt="Logo" sx={{ bgcolor: 'primary.main', mr: 1 }}>B</Avatar>
+                        <Avatar alt="MediCASP Logo" src={logo.src} sx={{ mr: 1 }} /> // Use Image component
                       )}
-                      <Box 
-                        bgcolor={message.role === 'model' ? 'primary.light' : 'secondary.light'} 
+                      <Box
+                        bgcolor={message.role === 'model' ? 'primary.light' : 'secondary.light'}
                         color={message.role === 'model' ? 'primary.contrastText' : 'secondary.contrastText'}
                         p={2}
                         borderRadius={2}
@@ -214,19 +280,19 @@ export default function Home() {
                     }}
                   />
                   <IconButton color="primary" onClick={() => {
-                    sendMessage(); 
-                    }} disabled={!message.trim()}>
+                    sendMessage();
+                  }} disabled={!message.trim()}>
                     <SendIcon />
                   </IconButton>
                 </Stack>
-                <Typography fontStyle="italic" sx={{ pt:1 , color: '#808080', textAlign: 'center' }}>
-                  This bot is designed to provide insights into a patients case of autism, it does not replace a real doctor!              
+                <Typography fontStyle="italic" sx={{ pt: 1, color: '#808080', textAlign: 'center' }}>
+                  This bot is designed to provide insights into a patients case of autism, it does not replace a real doctor!
                 </Typography>
               </Box>
             </Stack>
           </Box>
         </ThemeProvider>
       </Box>
-    </Box> 
+    </Box>
   );
 }
