@@ -57,6 +57,7 @@ export default function Home() {
   const [copdResultLine, setCOPDResults] = useState("")
   const [hypertensionResultLine, setHypertensionResults] = useState("")
   const [hypoglycemiaResultLine, setHypoglycemiaResults] = useState("")
+  const [pneumoniaResultLine, setPneumoniaResults] = useState("")
 
   const { isSignedIn, user, isLoaded } = useUser();
 
@@ -160,6 +161,7 @@ export default function Home() {
       setCOPDResults("")
       setHypertensionResults("")
       setHypoglycemiaResults("")
+      setPneumoniaResults("")
       for(const oneQuery of queries)
       {
         console.log("query results: " + oneQuery)
@@ -188,6 +190,10 @@ export default function Home() {
           else if(oneQuery.indexOf("has_hypoglycemia") != -1)
           {
             setDementiaResults("{SCREENING RESULTS: NO HYPOGLYCEMIA}") 
+          }
+          else if(oneQuery.indexOf("has_pneumonia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO PNEUMONIA}") 
           }
         }
         else
@@ -228,6 +234,10 @@ export default function Home() {
             const severityLevel = oneQuery.substring(startPoint, oneQuery.length - 2)
             setDementiaResults("{SCREENING RESULTS: POSSIBLE HYPOGLYCEMIA. SEVERITY LEVEL: " + severityLevel + "}")
           }
+          else if(oneQuery.indexOf("has_pneumonia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: PNEUMONIA MAY BE POSSIBLE. SHOULD BE MONITORED.}")
+          }
         }
       }
     }
@@ -248,7 +258,9 @@ export default function Home() {
     //try to get AI's response
     try {
       //reponse stores AIs' response.
-      const trueUserMessage = autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + copdResultLine + "\n" + hypertensionResultLine + "\n" + hypoglycemiaResultLine + "\n" + message
+      const trueUserMessage = autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + 
+        copdResultLine + "\n" + hypertensionResultLine + "\n" + hypoglycemiaResultLine + 
+        "\n" + pneumoniaResultLine + "\n" + message
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 'Content-Type': "application/json" },
@@ -260,6 +272,7 @@ export default function Home() {
       setCOPDResults("")
       setHypertensionResults("")
       setHypoglycemiaResults("")
+      setPneumoniaResults("")
       const data = await response.json();
       const botResponse = { role: "model", parts: [{ text: data.message }] };
       //add the ai's message to the history

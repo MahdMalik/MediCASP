@@ -22,4 +22,5 @@ has_pneumonia(X, Y):-
     hasWetLungSounds(X, True5),
     hasChills(X, True6),
     Y is True1 + True2 + True3 + True4 + True5 + True6,
-    Y > 2.
+    Y > 1.
+?- has_pneumonia([fever, coughing_sputum, shallow_breath, rapid_breathing, wet_lung_sounds, chills], Y).

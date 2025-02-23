@@ -31,6 +31,9 @@ def process_data():
     elif(queryPhrase.find("has_hypoglycemia") != -1):
         file_path = "C:/Users/mahd/Documents/MediCASP/hypoglycemia.pl"
         fileToCall = "hypoglycemia.pl"
+    elif(queryPhrase.find("has_pneumonia") != -1):
+        file_path = "C:/Users/mahd/Documents/MediCASP/pneumonia.pl"
+        fileToCall = "pneumonia.pl"
     # Open the file in append mode ('a')
     with open(file_path, 'a') as file:
         file.write("\n?- " + queryPhrase)
