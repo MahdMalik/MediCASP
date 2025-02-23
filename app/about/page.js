@@ -6,6 +6,8 @@ import {
     createTheme, ThemeProvider, Fade, IconButton, CircularProgress,
   } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
+import { SignUp, SignIn, SignedIn, SignedOut, UserButton} from '@clerk/nextjs'
+
   
 
 // Import your logo
@@ -41,22 +43,32 @@ const About = () => {
             bgcolor: '#f5f5f5',
             fontFamily: 'Roboto, sans-serif',
         }}>
-            {/* navibar ----------------------------------------------------------------------------------------------*/}
-            <ThemeProvider theme={theme}>
-                <AppBar position="static">
-                    <Toolbar>
+        {/* navibar ----------------------------------------------------------------------------------------------*/}
+           <ThemeProvider theme={theme}>
+            <AppBar position="static">
+                <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>              
+                {/* <Box style={{ display: 'flex', alignItems: 'center' }}> */}
+                    <Button color="inherit" href="/" sx={{ ml: 2 }}>
                     <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
                         MediCASP
                     </Typography>
-                    <Button color="inherit" href="/" sx={{ ml: 2 }}>
-                        Home
                     </Button>
+                {/* </Box> */}
+                <Box style={{ display: 'flex', alignItems: 'center' }}>
                     <Button color="inherit" href="/about" sx={{ ml: 2 }}>
-                        About
+                    About
                     </Button>
-                    </Toolbar>
-                </AppBar>
-            </ThemeProvider>
+                    <SignedOut>
+                        <Button color="inherit" href="/login">{' '}Login</Button>
+                        <Button color="inherit" href="/sign-up">{' '}Sign Up</Button>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
+                </Box>
+                </Toolbar>
+            </AppBar>
+           </ThemeProvider>
 
             {/* Main Content ----------------------------------------------------------------------------------------------*/}
             <Container maxWidth="md" sx={{ py: 6, spaceY: 6 }} >

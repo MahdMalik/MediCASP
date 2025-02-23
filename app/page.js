@@ -7,6 +7,12 @@ import {
   createTheme, ThemeProvider, Fade, IconButton, CircularProgress,
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs';
 
 // Import your logo
 import logo from '../public/logoV2.png'; // public pathway
@@ -173,16 +179,26 @@ export default function Home() {
         {/* navibar ----------------------------------------------------------------------------------------------*/}
         <ThemeProvider theme={theme}>
           <AppBar position="static">
-            <Toolbar>
-              <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
-                MediCASP
-              </Typography>
-              <Button color="inherit" href="/" sx={{ ml: 2 }}>
-                Home
-              </Button>
-              <Button color="inherit" href="/about" sx={{ ml: 2 }}>
-                About
-              </Button>
+            <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>              
+              {/* <Box style={{ display: 'flex', alignItems: 'center' }}> */}
+                <Button color="inherit" href="/" sx={{ ml: 2 }}>
+                  <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
+                    MediCASP
+                  </Typography>
+                </Button>
+              {/* </Box> */}
+              <Box style={{ display: 'flex', alignItems: 'center' }}>
+                <Button color="inherit" href="/about" sx={{ ml: 2 }}>
+                  About
+                </Button>
+                  <SignedOut>
+                    <Button color="inherit" href="/login">{' '}Login</Button>
+                    <Button color="inherit" href="/sign-up">{' '}Sign Up</Button>
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
+              </Box>
             </Toolbar>
           </AppBar>
         </ThemeProvider>
