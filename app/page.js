@@ -188,6 +188,19 @@ export default function Home() {
         </ThemeProvider>
 
         {/* Background Image ----------------------------------------------------------------------------------------------*/}
+        <Image 
+          src="/mdcsp_bckgrnd.png" 
+          alt="Background" 
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          style={{ 
+            zIndex: -1,  // Ensures image is behind other content
+            opacity: 0.4 // Makes background slightly transparent
+          }}
+        />
+
+        {/* Chat Box ----------------------------------------------------------------------------------------------*/}
         <ThemeProvider theme={theme}>
           <Box sx={{
             position: 'fixed',
