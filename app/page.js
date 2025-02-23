@@ -108,24 +108,48 @@ export default function Home() {
     setCoverPageOpacity(1); // Reset opacity when cover page shows
   }, [showCoverPage]);
 
+
+  //TTS effects
+  const synthRef = useRef(null);
+
+    useEffect(() => {
+      synthRef.current = window.speechSynthesis;
+      
+      // Stop speech when switching tabs
+      const handleVisibilityChange = () => {
+          if (document.hidden) {
+              synthRef.current?.cancel();
+          }
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+  }, []);
+
   // Function to speak the text
   const speak = (text) => {
-      if ('speechSynthesis' in window) {
-          const synth = window.speechSynthesis;
-          const utterance = new SpeechSynthesisUtterance(text);
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Stop previous speech
+        synthRef.current?.cancel();
+        
+        // Configure speech
+        utterance.rate = 3.8;     // Speech speed (0.1 - 10), lower for more natural pace
+        utterance.pitch = 1.2;    // Speech pitch (0 - 2), adjust for a more natural tone
+        utterance.volume = 0.8;   // Volume (0 - 1), adjust as needed
 
-          // Configure speech (optional)
-          utterance.rate = 1;     // Speech speed (0.1 - 10)
-          utterance.pitch = 1;    // Speech pitch (0 - 2)
-          utterance.volume = 1;   // Volume (0 - 1)
-
-          synth.speak(utterance);
-      } else {
-          console.warn('Text-to-speech not supported in this browser.');
-      }
+        synthRef.current?.speak(utterance);
+    }
   };
 
   const sendMessage = async () => {
+      // Stop any ongoing speech before new message
+      synthRef.current?.cancel();
+
       console.log("Current line: " + addedResultLine)
       if (!message.trim()) return;
 
@@ -148,7 +172,7 @@ export default function Home() {
 
       // Speak the bot's response
       speak(data.message);
-      
+
       if (data.autismStatus.indexOf("has_autism") == -1) {
         console.log("HELP IN GAIA")
       }
