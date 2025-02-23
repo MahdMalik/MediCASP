@@ -15,7 +15,7 @@ const theme = createTheme({
   },
 });
 
-const quickReplies = ["I'd like a screening" , "I think I have symptoms for autism", "I have a question", "I want to know more about autism", "I want to know more about MediCASP"];
+const quickReplies = ["I'd like a screening" , "I think I have symptoms for autism", "I have a question", "I think I have symptoms for dementia"];
 
 export default function Home() {
   const [messages, setMessages] = useState([{
@@ -142,7 +142,7 @@ export default function Home() {
                 color: 'white',
               }}>
                 <Typography variant="h6" fontWeight="600">
-                  Autis(CASP) Bot
+                  MediCASP Bot
                 </Typography>
               </Box>
 
