@@ -69,3 +69,6 @@ count_restricted_patterns_helper3(_, Acc, Count) :-
 ?- has_autism([motor_stereotypes, rigid_behaviour_patterns, social_emotional_deficits], Y).
 ?- has_autism([social_emotional_deficits, non_verbal_comm_deficits, motor_stereotypes, rigid_behaviour_patterns, highly_perseverative_interests], Y).
 ?- has_autism([social_emotional_deficits, non_verbal_comm_deficits, rel_maintenance_deficits, motor_stereotypes, rigid_behaviour_patterns, highly_perseverative_interests, hyper_hyporeactivity], Y).
+?- has_autism([motor_stereotypes, social_emotional_deficits, rigid_behaviour_patterns], Y).
+?- has_autism([motor_stereotypes, social_emotional_deficits, rigid_behaviour_patterns], Y).
+?- has_autism([motor_stereotypes, social_emotional_deficits, rigid_behaviour_patterns], Y).
