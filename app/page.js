@@ -7,6 +7,8 @@ import {
   createTheme, ThemeProvider, Fade, IconButton, CircularProgress,
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
+import MicIcon from '@mui/icons-material/Mic'; // Import microphone icon
+import StopIcon from '@mui/icons-material/Stop'; // Import stop icon
 import {
   SignInButton,
   SignedIn,
@@ -50,6 +52,7 @@ export default function Home() {
   const [showCoverPage, setShowCoverPage] = useState(true);
   const [addedResultLine, setResults] = useState("");
   const [coverPageOpacity, setCoverPageOpacity] = useState(1);
+  const [isListening, setIsListening] = useState(false); // State to manage listening status
   //These variables store the results of our queries that we have sent out.
   const [autismResultLine, setAutismResults] = useState("")
   const [dementiaResultLine, setDementiaResults] = useState("")
@@ -59,9 +62,10 @@ export default function Home() {
   const [hypoglycemiaResultLine, setHypoglycemiaResults] = useState("")
   const [pneumoniaResultLine, setPneumoniaResults] = useState("")
   const [lastQuery, setLastQuery] = useState("")
-
   const { isSignedIn, user, isLoaded } = useUser();
+  const recognitionRef = useRef(null); // Ref for the SpeechRecognition object
 
+  // Initialize SpeechRecognition object
   useEffect(() => {
       if (isLoaded) {
           let initialGreeting = "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.";
@@ -93,6 +97,7 @@ export default function Home() {
       scrollToBottom();
   }, [messages]);
 
+  // Fade out the cover page after 1 second
   useEffect(() => {
   if (showCoverPage) {
       const timeoutId = setTimeout(() => {
@@ -140,19 +145,72 @@ export default function Home() {
   // Function to speak the text
   const speak = (text) => {
     if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Stop previous speech
-        synthRef.current?.cancel();
-        
-        // Configure speech
-        utterance.rate = 3.8;     // Speech speed (0.1 - 10), lower for more natural pace
-        utterance.pitch = 1.2;    // Speech pitch (0 - 2), adjust for a more natural tone
-        utterance.volume = 0.8;   // Volume (0 - 1), adjust as needed
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
 
-        synthRef.current?.speak(utterance);
+      // Stop any ongoing speech before new message
+      synthRef.current?.cancel();
+
+      // Voice Selection
+      const voices = synth.getVoices();
+      if (voices.length > 0) {
+          const preferredVoice = voices.find(voice => voice.name.includes('Ava')); // Example: looking for a voice that includes 'Ava'
+          utterance.voice = preferredVoice || voices[0]; // Use preferred voice or default
+      }
+
+      // Configure speech
+      utterance.rate = 3.8;     // Speech speed (0.1 - 10), lower for more natural pace
+      utterance.pitch = 1.2;    // Speech pitch (0 - 2), adjust for a more natural tone
+      utterance.volume = 0.8;   // Volume (0 - 1), adjust as needed
+
+      synth.speak(utterance);
+    } else {
+        console.warn('Text-to-speech not supported in this browser.');
     }
   };
+
+  // Function to start listening
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+        console.log("Speech Recognition Not Available")
+        return;
+    }
+    setIsListening(true);
+    recognitionRef.current = new webkitSpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'en-US';
+
+    recognitionRef.current.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                transcript += event.results[i][0].transcript;
+            }
+        }
+        setMessage(transcript); // Set the transcribed message to the input
+    };
+
+    recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+    };
+
+    recognitionRef.current.onend = () => {
+        setIsListening(false);
+    };
+
+    recognitionRef.current.start();
+  };
+
+  // Function to stop listening
+  const stopListening = () => {
+      if (recognitionRef.current) {
+          recognitionRef.current.stop();
+          setIsListening(false);
+      }
+  };
+  
   const parseQueryResults = async(queries) => {
     if(queries.length != 0)
     {
@@ -362,7 +420,7 @@ export default function Home() {
           quality={100}
           style={{ 
             zIndex: -1,  // Ensures image is behind other content
-            opacity: 0.4 // Makes background slightly transparent
+            opacity: 0.8  // Makes background slightly transparent
           }}
         />
 
@@ -375,7 +433,7 @@ export default function Home() {
             width: "90%",
             height: "83%",
             borderRadius: 2,
-            boxShadow: 3,
+            boxShadow: 5,
             overflow: 'hidden',
             bgcolor: 'background.paper',
           }}>
@@ -462,6 +520,12 @@ export default function Home() {
                     sendMessage();
                   }} disabled={!message.trim()}>
                     <SendIcon />
+                  </IconButton>
+                  <IconButton
+                      color={isListening ? "error" : "primary"}
+                      onClick={isListening ? stopListening : startListening}
+                  >
+                      {isListening ? <StopIcon /> : <MicIcon />}
                   </IconButton>
                 </Stack>
                 <Typography fontStyle="italic" sx={{ pt: 1, color: '#808080', textAlign: 'center' }}>
