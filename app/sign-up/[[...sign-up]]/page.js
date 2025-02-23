@@ -63,6 +63,20 @@ export default function SignUpPage() {
       </AppBar>
     </ThemeProvider>
    
+    {/* Background Image ----------------------------------------------------------------------------------------------*/}
+      <Image 
+        src="/mdcsp_bckgrnd.png" 
+        alt="Background" 
+        layout="fill"
+        objectFit="cover"
+        quality={100}
+        style={{ 
+          zIndex: -1,  // Ensures image is behind other content
+          opacity: 0.8  // Makes background slightly transparent
+        }}
+      />
+
+    {/* Sign Up Form ----------------------------------------------------------------------------------------------*/}
     <Box
       display="flex"
       flexDirection="column"
@@ -70,7 +84,7 @@ export default function SignUpPage() {
       alignItems="center"
       sx={{ textAlign: 'center', my: 4 }}
     >
-      <Typography variant="h4" component="h1" gutterBottom>
+      <Typography variant="h4" component="h1" fontWeight="600" color='#02023a' gutterBottom >
         Sign Up
       </Typography>
       <SignUp />

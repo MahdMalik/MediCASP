@@ -40,7 +40,7 @@ const About = () => {
     return (
         <Box sx={{
             minHeight: '100vh',
-            bgcolor: '#f5f5f5',
+            // bgcolor: '#f5f5f5',
             fontFamily: 'Roboto, sans-serif',
         }}>
         {/* navibar ----------------------------------------------------------------------------------------------*/}
@@ -70,15 +70,39 @@ const About = () => {
             </AppBar>
            </ThemeProvider>
 
+           {/* Background Image ----------------------------------------------------------------------------------------------*/}
+            <Box
+                sx={{
+                    position: 'fixed', // Change to fixed
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: -1,
+                    overflow: 'hidden', // Hide any overflow
+                }}
+            >
+                <Image
+                    src="/mdcsp_bckgrnd.png"
+                    alt="Background"
+                    layout="fill"
+                    objectFit="cover"
+                    quality={100}
+                    style={{
+                    opacity: 0.8
+                    }}
+                />
+            </Box>
+            
             {/* Main Content ----------------------------------------------------------------------------------------------*/}
-            <Container maxWidth="md" sx={{ py: 6, spaceY: 6 }} >
+            <Container maxWidth="md" sx={{ py: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {/* Introduction Card */}
-                <Paper elevation={3} sx={{ p: 4 }}>
+                <Paper elevation={3} sx={{ p: 4, backgroundColor: '#f5f5f5' }}>
                     <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#02023a' }}>
                         About MediCASP
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'gray.700' }}>
-                        MediCASP is a comprehensive medical support assistant designed to help screen for multiple medical conditions and provide preliminary insights into potential symptoms. Our platform combines advanced AI technology with medical knowledge to offer accessible initial assessments for various health conditions.
+                        MediCASP is a comprehensive medical support assistant designed to help screen for multiple medical conditions and provide preliminary insights into potential symptoms. Our platform combines advanced AI and automated reasoning technology with medical knowledge to offer accessible initial assessments for various health conditions.
                     </Typography>
                 </Paper>
 
@@ -128,7 +152,7 @@ const About = () => {
                 </Paper>
 
                 {/* Purpose Card ----------------------------------------------------------------------------------------------*/}
-                <Paper elevation={3} sx={{ p: 4 }}>
+                <Paper elevation={3} sx={{ p: 4, backgroundColor: '#f5f5f5' }}>
                     <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#02023a' }}>
                         Our Purpose
                     </Typography>
@@ -156,7 +180,7 @@ const About = () => {
                 </Paper>
 
                 {/* Disclaimer Card ----------------------------------------------------------------------------------------------*/}
-                <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
+                <Paper elevation={3} sx={{ p: 4, backgroundColor: '#f5f5f5', textAlign: 'center' }}>
                     <Typography variant="h6" sx={{ color: '#00C850', fontStyle: 'italic' }}>
                         Important Disclaimer
                     </Typography>
