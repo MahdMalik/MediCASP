@@ -265,7 +265,7 @@ export async function POST(req)
         const actualQuery = currentQuery.substring(currentQuery.indexOf("has_"), currentQuery.length - 1)
         try
         {
-          const returnedValues = await fetch('http://localhost:5000/api/backend', {
+          const returnedValues = await fetch('https://xvps6bv9m6.execute-api.us-east-2.amazonaws.com/TestStage/linuxCaller2', {
             method: 'POST',
             headers: {'Content-Type': 'application/json',},
             body: JSON.stringify(actualQuery)
