@@ -9,8 +9,8 @@ import SendIcon from '@mui/icons-material/Send';
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#1976d2' },
-    secondary: { main: '#00C853' },
+    primary: { main: '#02023a' },
+    secondary: { main: '#00C850' },
     background: { default: '#f5f5f5', paper: '#ffffff' },
   },
 });
