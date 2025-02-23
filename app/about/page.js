@@ -6,6 +6,8 @@ import {
     createTheme, ThemeProvider, Fade, IconButton, CircularProgress,
   } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
+import { SignUp, SignIn, SignedIn, SignedOut, UserButton} from '@clerk/nextjs'
+
   
 
 // Import your logo
@@ -33,7 +35,7 @@ const theme = createTheme({
   },
 });
 
-// About page component
+// About page component 
 const About = () => {
     return (
         <Box sx={{
@@ -41,24 +43,35 @@ const About = () => {
             bgcolor: '#f5f5f5',
             fontFamily: 'Roboto, sans-serif',
         }}>
-            {/* navibar */}
-            <ThemeProvider theme={theme}>
+        {/* navibar ----------------------------------------------------------------------------------------------*/}
+           <ThemeProvider theme={theme}>
             <AppBar position="static">
-                <Toolbar>
-                <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
-                    MediCASP
-                </Typography>
-                <Button color="inherit" href="/" sx={{ ml: 2 }}>
-                    Home
-                </Button>
-                <Button color="inherit" href="/about" sx={{ ml: 2 }}>
+                <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>              
+                {/* <Box style={{ display: 'flex', alignItems: 'center' }}> */}
+                    <Button color="inherit" href="/" sx={{ ml: 2 }}>
+                    <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
+                        MediCASP
+                    </Typography>
+                    </Button>
+                {/* </Box> */}
+                <Box style={{ display: 'flex', alignItems: 'center' }}>
+                    <Button color="inherit" href="/about" sx={{ ml: 2 }}>
                     About
-                </Button>
+                    </Button>
+                    <SignedOut>
+                        <Button color="inherit" href="/login">{' '}Login</Button>
+                        <Button color="inherit" href="/sign-up">{' '}Sign Up</Button>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
+                </Box>
                 </Toolbar>
             </AppBar>
-        </ThemeProvider>
-            {/* Main Content */}
-            <Container maxWidth="md" sx={{ py: 6, spaceY: 6 }}>
+           </ThemeProvider>
+
+            {/* Main Content ----------------------------------------------------------------------------------------------*/}
+            <Container maxWidth="md" sx={{ py: 6, spaceY: 6 }} >
                 {/* Introduction Card */}
                 <Paper elevation={3} sx={{ p: 4 }}>
                     <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#02023a' }}>
@@ -69,7 +82,7 @@ const About = () => {
                     </Typography>
                 </Paper>
 
-                {/* Medical Conditions Card */}
+                {/* Medical Conditions Card ----------------------------------------------------------------------------------------------*/}
                 <Paper elevation={3} sx={{ p: 4 }}>
                     <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#02023a' }}>
                         Medical Conditions We Screen
@@ -99,16 +112,22 @@ const About = () => {
                                 <Typography variant="body2" sx={{ color: 'gray.700' }}>Joint pain assessment and early arthritis symptom screening.</Typography>
                             </Paper>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} md={6}>
                             <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
                                 <Typography variant="h6" sx={{ color: '#00C850' }}>Diabetes</Typography>
                                 <Typography variant="body2" sx={{ color: 'gray.700' }}>Blood sugar management guidance and diabetes risk assessment.</Typography>
                             </Paper>
                         </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>And more ...</Typography>
+                                <Typography variant="body2" sx={{ color: 'gray.700' }}>There will be more disabilties and diseases coming soon...</Typography>
+                            </Paper>
+                        </Grid>
                     </Grid>
                 </Paper>
 
-                {/* Purpose Card */}
+                {/* Purpose Card ----------------------------------------------------------------------------------------------*/}
                 <Paper elevation={3} sx={{ p: 4 }}>
                     <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#02023a' }}>
                         Our Purpose
@@ -121,7 +140,7 @@ const About = () => {
                     </Typography>
                 </Paper>
 
-                {/* Features Card */}
+                {/* Features Card ----------------------------------------------------------------------------------------------*/}
                 <Paper elevation={3} sx={{ p: 4 }}>
                     <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#02023a' }}>
                         Key Features
@@ -136,7 +155,7 @@ const About = () => {
                     </Typography>
                 </Paper>
 
-                {/* Disclaimer Card */}
+                {/* Disclaimer Card ----------------------------------------------------------------------------------------------*/}
                 <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
                     <Typography variant="h6" sx={{ color: '#00C850', fontStyle: 'italic' }}>
                         Important Disclaimer
