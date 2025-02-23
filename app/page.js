@@ -11,7 +11,8 @@ import {
   SignInButton,
   SignedIn,
   SignedOut,
-  UserButton
+  UserButton,
+  useUser
 } from '@clerk/nextjs';
 
 // Import your logo
@@ -43,15 +44,29 @@ const theme = createTheme({
 const quickReplies = ["I'd like a screening", "I think I have symptoms for autism", "I have a question", "I think I have symptoms for dementia"];
 
 export default function Home() {
-  const [messages, setMessages] = useState([{
-    role: "model",
-    parts: [{ text: "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started. " }]
-  }]);
+  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showCoverPage, setShowCoverPage] = useState(true);
-  const [addedResultLine, setResults] = useState("")
+  const [addedResultLine, setResults] = useState("");
   const [coverPageOpacity, setCoverPageOpacity] = useState(1);
+
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  useEffect(() => {
+    if (isLoaded) {
+      let initialGreeting = "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.";
+
+      if (isSignedIn && user) {
+        initialGreeting = `Hello ${user.firstName || user.username || 'there'}! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.`;
+      }
+
+      setMessages([{
+        role: "model",
+        parts: [{ text: initialGreeting }]
+      }]);
+    }
+  }, [isLoaded, isSignedIn, user]);
 
   // Ref for the chat box
   const chatBoxRef = useRef(null);
