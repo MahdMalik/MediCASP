@@ -53,6 +53,15 @@ export default function Home() {
   const [addedResultLine, setResults] = useState("");
   const [coverPageOpacity, setCoverPageOpacity] = useState(1);
   const [isListening, setIsListening] = useState(false); // State to manage listening status
+  //These variables store the results of our queries that we have sent out.
+  const [autismResultLine, setAutismResults] = useState("")
+  const [dementiaResultLine, setDementiaResults] = useState("")
+  const [arthritisResultLine, setArthritisResults] = useState("")
+  const [copdResultLine, setCOPDResults] = useState("")
+  const [hypertensionResultLine, setHypertensionResults] = useState("")
+  const [hypoglycemiaResultLine, setHypoglycemiaResults] = useState("")
+  const [pneumoniaResultLine, setPneumoniaResults] = useState("")
+  const [lastQuery, setLastQuery] = useState("")
   const { isSignedIn, user, isLoaded } = useUser();
   const recognitionRef = useRef(null); // Ref for the SpeechRecognition object
 
@@ -112,8 +121,7 @@ export default function Home() {
     }
     setCoverPageOpacity(1); // Reset opacity when cover page shows
   }, [showCoverPage]);
-
-
+  //function to send a message to the chatbot.
   //TTS effects
   const synthRef = useRef(null);
 
@@ -202,54 +210,138 @@ export default function Home() {
           setIsListening(false);
       }
   };
+  
+  const parseQueryResults = async(queries) => {
+    if(queries.length != 0)
+    {
+      setAutismResults("")
+      setDementiaResults("")
+      setArthritisResults("")
+      setCOPDResults("")
+      setHypertensionResults("")
+      setHypoglycemiaResults("")
+      setPneumoniaResults("")
+      for(const oneQuery of queries)
+      {
+        console.log("query results: " + oneQuery)
+        if(oneQuery.indexOf("no models") != -1 || oneQuery == "no.")
+        {
+          if(oneQuery.indexOf("has_autism") != -1)
+          {
+            setAutismResults("{SCREENING RESULTS: NO AUTISM}") 
+          }
+          else if(oneQuery.indexOf("has_dementia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO DEMENTIA}") 
+          }
+          else if(oneQuery.indexOf("has_ra") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO ARTHRITIS}") 
+          }
+          else if(oneQuery.indexOf("has_copd") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO COPD}") 
+          }
+          else if(oneQuery.indexOf("has_hyper_hypo_tension") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO HYPERTENSION OR HYPOTENSION}") 
+          }
+          else if(oneQuery.indexOf("has_hypoglycemia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO HYPOGLYCEMIA}") 
+          }
+          else if(oneQuery.indexOf("has_pneumonia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO PNEUMONIA}") 
+          }
+        }
+        else
+        {
+          const searchForPhrase = "Y = "
+          const pointOfY = oneQuery.indexOf(searchForPhrase)
+          if(oneQuery.indexOf("has_autism") != -1)
+          {
+            const severityLevel = parseInt(oneQuery.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
+            setAutismResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+          }
+          else if(oneQuery.indexOf("has_dementia") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, startPoint + 6)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE DEMENTIA. SEVERITY LEVEL: " + severityLevel + "}")
+          }
+          else if(oneQuery.indexOf("has_ra") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, oneQuery.length - 1)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE ARTHRITIS. SEVERITY LEVEL: " + severityLevel + "}")
+          }
+          else if(oneQuery.indexOf("has_copd") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: COPD MAY BE POSSIBLE. SHOULD BE MONITORED.}")
+          }
+          else if(oneQuery.indexOf("has_hyper_hypo_tension") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const typeOfBpDisorder = oneQuery.substring(startPoint, oneQuery.length - 2)
+            
+            setDementiaResults("{SCREENING RESULTS: USER MAY HAVE " + typeOfBpDisorder + ". SHOULD BE MONITORED.}")
+          }
+          else if(oneQuery.indexOf("has_hypoglycemia") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, oneQuery.length - 2)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE HYPOGLYCEMIA. SEVERITY LEVEL: " + severityLevel + "}")
+          }
+          else if(oneQuery.indexOf("has_pneumonia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: PNEUMONIA MAY BE POSSIBLE. SHOULD BE MONITORED.}")
+          }
+        }
+      }
+    }
+  }
 
-  // Function to send a message
-  const sendMessage = async () => {
-      // Stop any ongoing speech before new message
-      synthRef.current?.cancel();
-
-      console.log("Current line: " + addedResultLine)
-      if (!message.trim()) return;
-
-      setMessages((prevMessages) => [
-          ...prevMessages,
-          { role: "user", parts: [{ text: message }] },
-      ]);
-      setMessage('');
-      setIsTyping(true);
-
-      try {
+  const sendMessage = async() => {
+    //don't send empty messages
+    if (!message.trim()) return;
+    //add it to the messages array
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: "user", parts: [{ text: message }] },
+    ]);
+    //reset message
+    setMessage('');
+    //show AI is typing
+    setIsTyping(true);
+    //try to get AI's response
+    try {
+      //reponse stores AIs' response.
+      const trueUserMessage = "CURRENT QUERIES: " + lastQuery + "\nQUERY RESULTS (if any): "  + autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + 
+        copdResultLine + "\n" + hypertensionResultLine + "\n" + hypoglycemiaResultLine + 
+        "\n" + pneumoniaResultLine + "\n" + "USER MESSAGE: " + message
       const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { 'Content-Type': "application/json" },
-          body: JSON.stringify([...messages, { role: "user", parts: [{ text: addedResultLine + "\n" + message }] }])
+        method: "POST",
+        headers: { 'Content-Type': "application/json" },
+        body: JSON.stringify([...messages, {role: "user", parts: [{text: trueUserMessage}]}])
       });
+      setAutismResults("")
+      setDementiaResults("")
+      setArthritisResults("")
+      setCOPDResults("")
+      setHypertensionResults("")
+      setHypoglycemiaResults("")
+      setPneumoniaResults("")
       const data = await response.json();
       const botResponse = { role: "model", parts: [{ text: data.message }] };
+      //add the ai's message to the history
       setMessages((prevMessages) => [...prevMessages, botResponse]);
-
       // Speak the bot's response
       speak(data.message);
-
-      if (data.autismStatus.indexOf("has_autism") == -1) {
-        console.log("HELP IN GAIA")
-      }
-      console.log("john query: " + data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
-      if (data.queryResult.length != 0) {
-        setResults("")
-        console.log("query result: " + data.queryResult)
-        if (data.queryResult.indexOf("no models") != -1) {
-          setResults("{SCREENING RESULTS: NO AUTISM}")
-        }
-
-        else {
-
-          const searchForPhrase = "Y = "
-          const pointOfY = data.queryResult.indexOf(searchForPhrase)
-          const severityLevel = parseInt(data.queryResult.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
-          setResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}")
-        }
-      }
+      console.log("john query: " + data.conditionStatus)
+      setLastQuery(data.conditionStatus)
+      //if there was a query returned.
+      parseQueryResults(data.queryResult)
 
     } catch (error) {
       console.error("Error sending message:", error);
@@ -437,7 +529,7 @@ export default function Home() {
                   </IconButton>
                 </Stack>
                 <Typography fontStyle="italic" sx={{ pt: 1, color: '#808080', textAlign: 'center' }}>
-                  This bot is designed to provide insights into a patients case of autism, it does not replace a real doctor!
+                  This bot is designed to provide insights into a patients case of medical conditions, it does not replace a real doctor!
                 </Typography>
               </Box>
             </Stack>
