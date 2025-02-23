@@ -90,6 +90,46 @@ export default function Home() {
     setCoverPageOpacity(1); // Reset opacity when cover page shows
   }, [showCoverPage]);
   //function to send a message to the chatbot.
+
+  const parseQueryResults = async(queries) => {
+    if(queries.length != 0)
+    {
+      setAutismResults("")
+      setDementiaResults("")
+      for(const oneQuery of queries)
+      {
+        console.log("query results: " + oneQuery)
+        if(oneQuery.indexOf("no models") != -1)
+        {
+          if(oneQuery.indexOf("has_autism") != -1)
+          {
+            setAutismResults("{SCREENING RESULTS: NO AUTISM}") 
+          }
+          else if(oneQuery.indexOf("has_dementia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO DEMENTIA}") 
+          }
+        }
+        else
+        {
+          const searchForPhrase = "Y = "
+          const pointOfY = oneQuery.indexOf(searchForPhrase)
+          if(oneQuery.indexOf("has_autism") != -1)
+          {
+            const severityLevel = parseInt(oneQuery.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
+            setAutismResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+          }
+          else if(oneQuery.indexOf("has_dementia") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, startPoint + 6)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE DEMENTIA. SEVERITY LEVEL: " + severityLevel + "}")
+          }
+        }
+      }
+    }
+  }
+
   const sendMessage = async() => {
     console.log("Current autism line: "  + autismResultLine)
     //don't send empty messages
@@ -111,6 +151,8 @@ export default function Home() {
         headers: { 'Content-Type': "application/json" },
         body: JSON.stringify([...messages, {role: "user", parts: [{text: autismResultLine + "\n" + dementiaResultLine + "\n" + message}]}])
       });
+      setAutismResults("")
+      setDementiaResults("")
       const data = await response.json();
       //add the ai's message to the history
       setMessages((prevMessages) => [
@@ -119,26 +161,7 @@ export default function Home() {
       ]);
       console.log("john query: " + data.conditionStatus)
       //if there was a query returned.
-      if(data.queryResult.length != 0)
-      {
-        setAutismResults("")
-        setDementiaResults("")
-        for(const oneQuery of data.queryResult)
-        {
-          console.log("query results: " + oneQuery)
-          if(oneQuery.indexOf("no models") != -1)
-          {
-            setAutismResults("{SCREENING RESULTS: NO AUTISM}") 
-          }
-          else
-          {
-            const searchForPhrase = "Y = "
-            const pointOfY = oneQuery.indexOf(searchForPhrase)
-            const severityLevel = parseInt(oneQuery.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
-            setAutismResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
-          }
-        }
-      }
+      parseQueryResults(data.queryResult)
 
     } catch (error) {
       console.error("Error sending message:", error);
