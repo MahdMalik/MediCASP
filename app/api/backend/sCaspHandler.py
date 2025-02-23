@@ -25,6 +25,9 @@ def process_data():
     elif(queryPhrase.find("has_copd") != -1):
         file_path = "C:/Users/mahd/Documents/MediCASP/copd.pl"
         fileToCall = "copd.pl"
+    elif(queryPhrase.find("has_hyper_hypo_tension") != -1):
+        file_path = "C:/Users/mahd/Documents/MediCASP/hypertension.pl"
+        fileToCall = "hypertension.pl"
     # Open the file in append mode ('a')
     with open(file_path, 'a') as file:
         file.write("\n?- " + queryPhrase)

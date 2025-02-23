@@ -138,3 +138,4 @@ old_adult_hyper_hypo_tension(Systolic, Diastolic, female, hypotension) :-
 
 has_hyper_hypo_tension(Systolic, Diastolic, Year, Gender, Y) :-
     old_adult_hyper_hypo_tension(Systolic, Diastolic, Gender, Y).
+?- has_hyper_hypo_tension(140, 40, 20, male, Y).
