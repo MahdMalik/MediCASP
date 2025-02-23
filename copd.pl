@@ -29,3 +29,10 @@ has_copd(X, Y) :-
     diminished_breath_sounds(X, C6),
     Y is C1 + C2 + C3 + C4 + C5 + C6,
     Y > 1.
+?- has_copd([barrel_chest, not_shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, not_diminished_breath_sounds], Y).
+?- has_copd([barrel_chest, not_shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, not_diminished_breath_sounds], Y).
+?- has_copd([barrel_chest, shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, diminished_breath_sounds], Y).
+?- has_copd([barrel_chest, shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, diminished_breath_sounds], Y).
+?- has_copd([barrel_chest, shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, diminished_breath_sounds], Y).
+?- has_copd([barrel_chest, shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, diminished_breath_sounds], Y).
+?- has_copd([barrel_chest, shallow_breathing, wheezing, low_pulse_ox, wet_lung_sounds, diminished_breath_sounds], Y).

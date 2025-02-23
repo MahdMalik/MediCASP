@@ -54,6 +54,7 @@ export default function Home() {
   const [autismResultLine, setAutismResults] = useState("")
   const [dementiaResultLine, setDementiaResults] = useState("")
   const [arthritisResultLine, setArthritisResults] = useState("")
+  const [copdResultLine, setCOPDResults] = useState("")
 
   const { isSignedIn, user, isLoaded } = useUser();
 
@@ -154,6 +155,7 @@ export default function Home() {
       setAutismResults("")
       setDementiaResults("")
       setArthritisResults("")
+      setCOPDResults("")
       for(const oneQuery of queries)
       {
         console.log("query results: " + oneQuery)
@@ -170,6 +172,10 @@ export default function Home() {
           else if(oneQuery.indexOf("has_ra") != -1)
           {
             setDementiaResults("{SCREENING RESULTS: NO ARTHRITIS}") 
+          }
+          else if(oneQuery.indexOf("has_copd") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO COPD}") 
           }
         }
         else
@@ -192,6 +198,10 @@ export default function Home() {
             const startPoint = pointOfY + searchForPhrase.length
             const severityLevel = oneQuery.substring(startPoint, oneQuery.length - 1)
             setDementiaResults("{SCREENING RESULTS: POSSIBLE ARTHRITIS. SEVERITY LEVEL: " + severityLevel + "}")
+          }
+          else if(oneQuery.indexOf("has_copd") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: COPD MAY BE POSSIBLE. SHOULD BE MONITORED.}")
           }
         }
       }
