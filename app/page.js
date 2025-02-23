@@ -159,8 +159,8 @@ export default function Home() {
       }
 
       // Configure speech
-      utterance.rate = 3.8;     // Speech speed (0.1 - 10), lower for more natural pace
-      utterance.pitch = 1.2;    // Speech pitch (0 - 2), adjust for a more natural tone
+      utterance.rate = 2;     // Speech speed (0.1 - 10), lower for more natural pace
+      utterance.pitch = 1.4;    // Speech pitch (0 - 2), adjust for a more natural tone
       utterance.volume = 0.8;   // Volume (0 - 1), adjust as needed
 
       synth.speak(utterance);
