@@ -161,6 +161,49 @@ export default function Home() {
     }
   };
 
+  // Function to start listening
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+        console.log("Speech Recognition Not Available")
+        return;
+    }
+    setIsListening(true);
+    recognitionRef.current = new webkitSpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'en-US';
+
+    recognitionRef.current.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                transcript += event.results[i][0].transcript;
+            }
+        }
+        setMessage(transcript); // Set the transcribed message to the input
+    };
+
+    recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+    };
+
+    recognitionRef.current.onend = () => {
+        setIsListening(false);
+    };
+
+    recognitionRef.current.start();
+  };
+
+  // Function to stop listening
+  const stopListening = () => {
+      if (recognitionRef.current) {
+          recognitionRef.current.stop();
+          setIsListening(false);
+      }
+  };
+
+  // Function to send a message
   const sendMessage = async () => {
       // Stop any ongoing speech before new message
       synthRef.current?.cancel();
