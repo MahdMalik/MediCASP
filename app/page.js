@@ -429,6 +429,12 @@ export default function Home() {
                   }} disabled={!message.trim()}>
                     <SendIcon />
                   </IconButton>
+                  <IconButton
+                      color={isListening ? "error" : "primary"}
+                      onClick={isListening ? stopListening : startListening}
+                  >
+                      {isListening ? <StopIcon /> : <MicIcon />}
+                  </IconButton>
                 </Stack>
                 <Typography fontStyle="italic" sx={{ pt: 1, color: '#808080', textAlign: 'center' }}>
                   This bot is designed to provide insights into a patients case of autism, it does not replace a real doctor!
