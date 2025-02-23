@@ -79,6 +79,7 @@ export default function Home() {
         {
           setResults("{SCREENING RESULTS: NO AUTISM}") 
         }
+        
         else
         {
           
