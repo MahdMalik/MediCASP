@@ -7,6 +7,13 @@ import {
   createTheme, ThemeProvider, Fade, IconButton, CircularProgress,
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useUser
+} from '@clerk/nextjs';
 
 // Import your logo
 import logo from '../public/logoV2.png'; // public pathway
@@ -16,81 +23,130 @@ import logo2 from '../public/logoV1.png'; // public pathway
 const logoColor = '#39FF14'; // This is green, dominant color in the logo
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#02023a', // Dark blue, also in the logo
-      contrastText: '#fff',  // White text for contrast
-    },
-    secondary: {
-      main: '#00C850',  // Lighter green, also in the logo
-      contrastText: '#000', // Black text for contrast
-    },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
-    },
+      primary: {
+          main: '#02023a', // Dark blue, also in the logo
+          contrastText: '#fff',  // White text for contrast
+      },
+      secondary: {
+          main: '#00C850',  // Lighter green, also in the logo
+          contrastText: '#000', // Black text for contrast
+      },
+      background: {
+          default: '#f5f5f5',
+          paper: '#ffffff',
+      },
   },
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+      fontFamily: 'Roboto, sans-serif',
   },
 });
 
 const quickReplies = ["I'd like a screening", "I think I have symptoms for autism", "I have a question", "I think I have symptoms for dementia"];
 
 export default function Home() {
-  const [messages, setMessages] = useState([{
-    role: "model",
-    parts: [{ text: "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started. " }]
-  }]);
+  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showCoverPage, setShowCoverPage] = useState(true);
-  const [addedResultLine, setResults] = useState("")
+  const [addedResultLine, setResults] = useState("");
   const [coverPageOpacity, setCoverPageOpacity] = useState(1);
   //These variables store the results of our queries that we have sent out.
   const [autismResultLine, setAutismResults] = useState("")
   const [dementiaResultLine, setDementiaResults] = useState("")
+
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  useEffect(() => {
+      if (isLoaded) {
+          let initialGreeting = "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.";
+
+          if (isSignedIn && user) {
+              initialGreeting = `Hello ${user.firstName || user.username || 'there'}! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.`;
+          }
+
+          setMessages([{
+              role: "model",
+              parts: [{ text: initialGreeting }]
+          }]);
+      }
+  }, [isLoaded, isSignedIn, user]);
 
   // Ref for the chat box
   const chatBoxRef = useRef(null);
 
   // Auto-scroll logic
   const scrollToBottom = () => {
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop =
-        chatBoxRef.current.scrollHeight;
-    }
+      if (chatBoxRef.current) {
+          chatBoxRef.current.scrollTop =
+              chatBoxRef.current.scrollHeight;
+      }
   };
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
+      scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
-    if (showCoverPage) {
+  if (showCoverPage) {
       const timeoutId = setTimeout(() => {
-        // Fade out effect
-        let opacity = 1;
-        const fadeOutInterval = setInterval(() => {
-          opacity -= 0.05; // Adjust the fade speed here
-          setCoverPageOpacity(opacity);
-          if (opacity <= 0) {
-            clearInterval(fadeOutInterval);
-            setShowCoverPage(false); // Fully hide the cover page
-          }
-        }, 50); // Update opacity every 50ms
+          // Fade out effect
+          let opacity = 1;
+          const fadeOutInterval = setInterval(() => {
+              opacity -= 0.05; // Adjust the fade speed here
+              setCoverPageOpacity(opacity);
+              if (opacity <= 0) {
+                  clearInterval(fadeOutInterval);
+                  setShowCoverPage(false); // Fully hide the cover page
+              }
+          }, 50); // Update opacity every 50ms
       }, 1000); // Wait for 1 second before fading
       const handleKeyPress = () => setShowCoverPage(false); // Hide on keypress
       window.addEventListener('keydown', handleKeyPress);
       return () => {
-        clearTimeout(timeoutId);
-        window.removeEventListener('keydown', handleKeyPress);
+          clearTimeout(timeoutId);
+          window.removeEventListener('keydown', handleKeyPress);
       };
     }
     setCoverPageOpacity(1); // Reset opacity when cover page shows
   }, [showCoverPage]);
   //function to send a message to the chatbot.
+  //TTS effects
+  const synthRef = useRef(null);
 
+    useEffect(() => {
+      synthRef.current = window.speechSynthesis;
+      
+      // Stop speech when switching tabs
+      const handleVisibilityChange = () => {
+          if (document.hidden) {
+              synthRef.current?.cancel();
+          }
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+  }, []);
+
+  // Function to speak the text
+  const speak = (text) => {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Stop previous speech
+        synthRef.current?.cancel();
+        
+        // Configure speech
+        utterance.rate = 3.8;     // Speech speed (0.1 - 10), lower for more natural pace
+        utterance.pitch = 1.2;    // Speech pitch (0 - 2), adjust for a more natural tone
+        utterance.volume = 0.8;   // Volume (0 - 1), adjust as needed
+
+        synthRef.current?.speak(utterance);
+    }
+  };
   const parseQueryResults = async(queries) => {
     if(queries.length != 0)
     {
@@ -154,11 +210,12 @@ export default function Home() {
       setAutismResults("")
       setDementiaResults("")
       const data = await response.json();
+      const botResponse = { role: "model", parts: [{ text: data.message }] };
       //add the ai's message to the history
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: "model", parts: [{ text: data.message }] }
-      ]);
+      setMessages((prevMessages) => [...prevMessages, botResponse]);
+
+      // Speak the bot's response
+      speak(data.message);
       console.log("john query: " + data.conditionStatus)
       //if there was a query returned.
       parseQueryResults(data.queryResult)
@@ -172,7 +229,7 @@ export default function Home() {
 
   return (
     <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      {/* coverpage */}
+      {/* coverpage ----------------------------------------------------------------------------------------------*/}
       {showCoverPage && (
         <Box
           sx={{
@@ -204,24 +261,47 @@ export default function Home() {
       {/* Rest of JSX */}
 
       <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
-        {/* navibar */}
+        {/* navibar ----------------------------------------------------------------------------------------------*/}
         <ThemeProvider theme={theme}>
           <AppBar position="static">
-            <Toolbar>
-              <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
-                MediCASP
-              </Typography>
-              <Button color="inherit" href="/" sx={{ ml: 2 }}>
-                Home
-              </Button>
-              <Button color="inherit" href="/about" sx={{ ml: 2 }}>
-                About
-              </Button>
+            <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>              
+              {/* <Box style={{ display: 'flex', alignItems: 'center' }}> */}
+                <Button color="inherit" href="/" sx={{ ml: 2 }}>
+                  <Image src={logo} alt="MediCASP Logo" width={40} height={40} /><Typography variant="h6" fontWeight="600">
+                    MediCASP
+                  </Typography>
+                </Button>
+              {/* </Box> */}
+              <Box style={{ display: 'flex', alignItems: 'center' }}>
+                <Button color="inherit" href="/about" sx={{ ml: 2 }}>
+                  About
+                </Button>
+                  <SignedOut>
+                    <Button color="inherit" href="/login">{' '}Login</Button>
+                    <Button color="inherit" href="/sign-up">{' '}Sign Up</Button>
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
+              </Box>
             </Toolbar>
           </AppBar>
         </ThemeProvider>
 
-        {/* Background Image */}
+        {/* Background Image ----------------------------------------------------------------------------------------------*/}
+        <Image 
+          src="/mdcsp_bckgrnd.png" 
+          alt="Background" 
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          style={{ 
+            zIndex: -1,  // Ensures image is behind other content
+            opacity: 0.4 // Makes background slightly transparent
+          }}
+        />
+
+        {/* Chat Box ----------------------------------------------------------------------------------------------*/}
         <ThemeProvider theme={theme}>
           <Box sx={{
             position: 'fixed',
@@ -235,7 +315,7 @@ export default function Home() {
             bgcolor: 'background.paper',
           }}>
             <Stack direction="column" height="100%">
-              {/* Header */}
+              {/* Header ----------------------------------------------------------------------------------------------*/}
               <Box sx={{
                 p: 2,
                 bgcolor: 'primary.main',
@@ -246,7 +326,7 @@ export default function Home() {
                 </Typography>
               </Box>
 
-              {/* Chat messages */}
+              {/* Chat messages ----------------------------------------------------------------------------------------------*/}
               <Box sx={{
                 flexGrow: 1,
                 overflow: 'auto',
@@ -289,7 +369,7 @@ export default function Home() {
                 )}
               </Box>
 
-              {/* Quick replies */}
+              {/* Quick replies ----------------------------------------------------------------------------------------------*/}
               <Stack direction="row" spacing={2} p={2}>
                 {quickReplies.map((reply, index) => (
                   <Button key={index} variant="outlined" size="small" onClick={() => setMessage(reply)}>
@@ -298,7 +378,7 @@ export default function Home() {
                 ))}
               </Stack>
 
-              {/* Input area */}
+              {/* Input area ----------------------------------------------------------------------------------------------*/}
               <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
                 <Stack direction="row" spacing={1}>
                   <TextField
