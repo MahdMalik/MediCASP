@@ -138,7 +138,7 @@ export default function Home() {
 
   return (
     <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      {/* coverpage */}
+      {/* coverpage ----------------------------------------------------------------------------------------------*/}
       {showCoverPage && (
         <Box
           sx={{
@@ -170,7 +170,7 @@ export default function Home() {
       {/* Rest of JSX */}
 
       <Box sx={{ position: 'relative', width: '100vw', height: '100vh' }}>
-        {/* navibar */}
+        {/* navibar ----------------------------------------------------------------------------------------------*/}
         <ThemeProvider theme={theme}>
           <AppBar position="static">
             <Toolbar>
@@ -187,7 +187,7 @@ export default function Home() {
           </AppBar>
         </ThemeProvider>
 
-        {/* Background Image */}
+        {/* Background Image ----------------------------------------------------------------------------------------------*/}
         <ThemeProvider theme={theme}>
           <Box sx={{
             position: 'fixed',
@@ -201,7 +201,7 @@ export default function Home() {
             bgcolor: 'background.paper',
           }}>
             <Stack direction="column" height="100%">
-              {/* Header */}
+              {/* Header ----------------------------------------------------------------------------------------------*/}
               <Box sx={{
                 p: 2,
                 bgcolor: 'primary.main',
@@ -212,7 +212,7 @@ export default function Home() {
                 </Typography>
               </Box>
 
-              {/* Chat messages */}
+              {/* Chat messages ----------------------------------------------------------------------------------------------*/}
               <Box sx={{
                 flexGrow: 1,
                 overflow: 'auto',
@@ -255,7 +255,7 @@ export default function Home() {
                 )}
               </Box>
 
-              {/* Quick replies */}
+              {/* Quick replies ----------------------------------------------------------------------------------------------*/}
               <Stack direction="row" spacing={2} p={2}>
                 {quickReplies.map((reply, index) => (
                   <Button key={index} variant="outlined" size="small" onClick={() => setMessage(reply)}>
@@ -264,7 +264,7 @@ export default function Home() {
                 ))}
               </Stack>
 
-              {/* Input area */}
+              {/* Input area ----------------------------------------------------------------------------------------------*/}
               <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
                 <Stack direction="row" spacing={1}>
                   <TextField
