@@ -43,7 +43,16 @@ const theme = createTheme({
   },
 });
 
-const quickReplies = ["I'd like a screening", "I think I have symptoms for autism", "I have a question", "I think I have symptoms for dementia"];
+const quickReplies = [
+  "I'd like a screening for arthritis.",
+  "I think I have symptoms for autism.",
+  "I'm concerned about dementia.",
+  "What are the symptoms of COPD?",
+  "Tell me about hypertension.",
+  "What should I do if I have hypoglycemia?",
+  "I'm worried about pneumonia.",
+  "I have a general health question."
+];
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
@@ -497,13 +506,31 @@ export default function Home() {
               </Box>
 
               {/* Quick replies ----------------------------------------------------------------------------------------------*/}
-              <Stack direction="row" spacing={2} p={2}>
-                {quickReplies.map((reply, index) => (
-                  <Button key={index} variant="outlined" size="small" onClick={() => setMessage(reply)}>
-                    {reply}
-                  </Button>
-                ))}
-              </Stack>
+              <Box sx={{ overflowX: 'auto', display: 'flex', p: 2 }}>
+                <Stack direction="row" spacing={2} flexWrap="nowrap">
+                  {quickReplies.map((reply, index) => (
+                    <Button 
+                      key={index} 
+                      variant="outlined" 
+                      size="small" 
+                      onClick={() => setMessage(reply)}
+                      sx={{
+                        minHeight: 'auto',
+                        height: '30px',
+                        p: 0.5,
+                        fontSize: '0.875rem',
+                        lineHeight: 1.5,
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {reply}
+                    </Button>
+                  ))}
+                </Stack>
+              </Box>
 
               {/* Input area ----------------------------------------------------------------------------------------------*/}
               <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
