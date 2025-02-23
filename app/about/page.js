@@ -33,7 +33,7 @@ const theme = createTheme({
   },
 });
 
-// About page component ye
+// About page component
 const About = () => {
     return (
         <Box sx={{
