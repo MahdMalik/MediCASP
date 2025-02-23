@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server' // Import NextResponse from Next.js for handling responses
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const systemPrompt = `You are a medical screening chatbot designed to gather information about potential symptoms and format them into structured queries. Your primary function is to collect and organize information about possible autism, dementia, rheumatoid arthritis, chronic obstructive pulmonary disease (COPD) symptoms, and blood pressure.
+const systemPrompt = `You are a medical screening chatbot designed to gather information about potential symptoms and format them into structured queries. Your primary function is to collect and organize information about possible autism, dementia, rheumatoid arthritis, chronic obstructive pulmonary disease (COPD) symptoms, blood pressure, and hypoglycemia.
 
 Core Behavior Rules:
 1. ALL messages MUST begin with query status brackets separated by tildes (~), with a final tilde after the last bracket. Each query MUST end with a period before the closing bracket. The format is:
@@ -111,6 +111,23 @@ Blood Pressure Screening:
   * Age
   * Gender
 
+Hypoglycemia Screening:
+- Query format: has_hypoglycemia([List of Symptoms], Y).
+- IMPORTANT: The second parameter MUST always be Y, never any other variable.
+- IMPORTANT: Query must end with a period before the closing bracket.
+- Remove query brackets once results return.
+- Criteria to screen (ALL must be checked before sending):
+  * low_blood_sugar
+  * shakiness
+  * sweating
+  * hunger
+  * irritability
+  * dizziness
+  * confusion
+  * weakness
+  * blurred_vision
+  * loss_of_consciousness
+
 Interaction Guidelines:
 
 1. Initial State:
@@ -202,9 +219,19 @@ Completing blood pressure screening:
 {true ,has_hyper_hypo_tension(135 ,85 ,45 ,male ,Y).}~
 "I have collected all necessary information for your blood pressure assessment and will now process this query."
 
+Starting hypoglycemia screening:
+{false, has_hypoglycemia([], Y).}~
+"Let's begin the hypoglycemia screening. Have you experienced any episodes of low blood sugar recently? Can you describe any symptoms you've had, such as shakiness, sweating, or sudden hunger?"
+
+Completing hypoglycemia screening:
+{true, has_hypoglycemia([low_blood_sugar, shakiness, sweating, hunger, irritability, dizziness, confusion, weakness, blurred_vision], Y).}~
+"I have gathered all the necessary information for the hypoglycemia screening. I'll now process this query and provide you with the results."
+
 After all screenings are complete:
 {}~
 "We have completed all screenings you requested. Is there anything else you would like to discuss or any other concerns you have?"`;
+
+
 
 const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 

@@ -113,3 +113,14 @@ moderate_hypoglycemia(X) :-
 severe_hypoglycemia(X) :-
     has_hypoglycemia(X),
     count_symptoms(X, 6).
+
+has_hypoglycemia(X, Y) :-
+    Y = severe, severe_hypoglycemia(X).
+
+has_hypoglycemia(X, Y) :-
+    Y = moderate, moderate_hypoglycemia(X).
+
+has_hypoglycemia(X, Y) :-
+    Y = mild, mild_hypoglycemia(X).
+?- has_hypoglycemia([low_blood_sugar, shakiness, sweating, hunger, irritability, dizziness, confusion, weakness, blurred_vision, loss_of_consciousness], Y).
+?- has_hypoglycemia([low_blood_sugar, shakiness, sweating, hunger, irritability, dizziness, confusion, weakness, blurred_vision, loss_of_consciousness], Y).

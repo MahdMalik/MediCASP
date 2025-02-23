@@ -56,6 +56,7 @@ export default function Home() {
   const [arthritisResultLine, setArthritisResults] = useState("")
   const [copdResultLine, setCOPDResults] = useState("")
   const [hypertensionResultLine, setHypertensionResults] = useState("")
+  const [hypoglycemiaResultLine, setHypoglycemiaResults] = useState("")
 
   const { isSignedIn, user, isLoaded } = useUser();
 
@@ -158,6 +159,7 @@ export default function Home() {
       setArthritisResults("")
       setCOPDResults("")
       setHypertensionResults("")
+      setHypoglycemiaResults("")
       for(const oneQuery of queries)
       {
         console.log("query results: " + oneQuery)
@@ -182,6 +184,10 @@ export default function Home() {
           else if(oneQuery.indexOf("has_hyper_hypo_tension") != -1)
           {
             setDementiaResults("{SCREENING RESULTS: NO HYPERTENSION OR HYPOTENSION}") 
+          }
+          else if(oneQuery.indexOf("has_hypoglycemia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO HYPOGLYCEMIA}") 
           }
         }
         else
@@ -210,12 +216,18 @@ export default function Home() {
             setDementiaResults("{SCREENING RESULTS: COPD MAY BE POSSIBLE. SHOULD BE MONITORED.}")
           }
           else if(oneQuery.indexOf("has_hyper_hypo_tension") != -1)
-            {
-              const startPoint = pointOfY + searchForPhrase.length
-              const typeOfBpDisorder = oneQuery.substring(startPoint, oneQuery.length - 2)
-              
-              setDementiaResults("{SCREENING RESULTS: USER MAY HAVE " + typeOfBpDisorder + ". SHOULD BE MONITORED.}")
-            }
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const typeOfBpDisorder = oneQuery.substring(startPoint, oneQuery.length - 2)
+            
+            setDementiaResults("{SCREENING RESULTS: USER MAY HAVE " + typeOfBpDisorder + ". SHOULD BE MONITORED.}")
+          }
+          else if(oneQuery.indexOf("has_hypoglycemia") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, oneQuery.length - 2)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE HYPOGLYCEMIA. SEVERITY LEVEL: " + severityLevel + "}")
+          }
         }
       }
     }
@@ -236,7 +248,7 @@ export default function Home() {
     //try to get AI's response
     try {
       //reponse stores AIs' response.
-      const trueUserMessage = autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + copdResultLine + "\n" + hypertensionResultLine + "\n" + message
+      const trueUserMessage = autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + copdResultLine + "\n" + hypertensionResultLine + "\n" + hypoglycemiaResultLine + "\n" + message
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 'Content-Type': "application/json" },
@@ -247,6 +259,7 @@ export default function Home() {
       setArthritisResults("")
       setCOPDResults("")
       setHypertensionResults("")
+      setHypoglycemiaResults("")
       const data = await response.json();
       const botResponse = { role: "model", parts: [{ text: data.message }] };
       //add the ai's message to the history
