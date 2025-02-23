@@ -50,6 +50,9 @@ export default function Home() {
   const [showCoverPage, setShowCoverPage] = useState(true);
   const [addedResultLine, setResults] = useState("");
   const [coverPageOpacity, setCoverPageOpacity] = useState(1);
+  //These variables store the results of our queries that we have sent out.
+  const [autismResultLine, setAutismResults] = useState("")
+  const [dementiaResultLine, setDementiaResults] = useState("")
 
   const { isSignedIn, user, isLoaded } = useUser();
 
@@ -107,8 +110,7 @@ export default function Home() {
     }
     setCoverPageOpacity(1); // Reset opacity when cover page shows
   }, [showCoverPage]);
-
-
+  //function to send a message to the chatbot.
   //TTS effects
   const synthRef = useRef(null);
 
@@ -145,53 +147,78 @@ export default function Home() {
         synthRef.current?.speak(utterance);
     }
   };
+  const parseQueryResults = async(queries) => {
+    if(queries.length != 0)
+    {
+      setAutismResults("")
+      setDementiaResults("")
+      for(const oneQuery of queries)
+      {
+        console.log("query results: " + oneQuery)
+        if(oneQuery.indexOf("no models") != -1)
+        {
+          if(oneQuery.indexOf("has_autism") != -1)
+          {
+            setAutismResults("{SCREENING RESULTS: NO AUTISM}") 
+          }
+          else if(oneQuery.indexOf("has_dementia") != -1)
+          {
+            setDementiaResults("{SCREENING RESULTS: NO DEMENTIA}") 
+          }
+        }
+        else
+        {
+          const searchForPhrase = "Y = "
+          const pointOfY = oneQuery.indexOf(searchForPhrase)
+          if(oneQuery.indexOf("has_autism") != -1)
+          {
+            const severityLevel = parseInt(oneQuery.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
+            setAutismResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}") 
+          }
+          else if(oneQuery.indexOf("has_dementia") != -1)
+          {
+            const startPoint = pointOfY + searchForPhrase.length
+            const severityLevel = oneQuery.substring(startPoint, startPoint + 6)
+            setDementiaResults("{SCREENING RESULTS: POSSIBLE DEMENTIA. SEVERITY LEVEL: " + severityLevel + "}")
+          }
+        }
+      }
+    }
+  }
 
-  const sendMessage = async () => {
-      // Stop any ongoing speech before new message
-      synthRef.current?.cancel();
-
-      console.log("Current line: " + addedResultLine)
-      if (!message.trim()) return;
-
-      setMessages((prevMessages) => [
-          ...prevMessages,
-          { role: "user", parts: [{ text: message }] },
-      ]);
-      setMessage('');
-      setIsTyping(true);
-
-      try {
+  const sendMessage = async() => {
+    console.log("Current autism line: "  + autismResultLine)
+    //don't send empty messages
+    if (!message.trim()) return;
+    //add it to the messages array
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: "user", parts: [{ text: message }] },
+    ]);
+    //reset message
+    setMessage('');
+    //show AI is typing
+    setIsTyping(true);
+    //try to get AI's response
+    try {
+      //reponse stores AIs' response.
       const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { 'Content-Type': "application/json" },
-          body: JSON.stringify([...messages, { role: "user", parts: [{ text: addedResultLine + "\n" + message }] }])
+        method: "POST",
+        headers: { 'Content-Type': "application/json" },
+        body: JSON.stringify([...messages, {role: "user", parts: [{text: autismResultLine + "\n" + dementiaResultLine + "\n" + message}]}])
       });
+      setAutismResults("")
+      setDementiaResults("")
       const data = await response.json();
       const botResponse = { role: "model", parts: [{ text: data.message }] };
+      //add the ai's message to the history
       setMessages((prevMessages) => [...prevMessages, botResponse]);
 
       // Speak the bot's response
       speak(data.message);
-
-      if (data.autismStatus.indexOf("has_autism") == -1) {
-        console.log("HELP IN GAIA")
-      }
-      console.log("john query: " + data.autismStatus.substring(data.autismStatus.indexOf("has_autism"), data.autismStatus.length - 1))
-      if (data.queryResult.length != 0) {
-        setResults("")
-        console.log("query result: " + data.queryResult)
-        if (data.queryResult.indexOf("no models") != -1) {
-          setResults("{SCREENING RESULTS: NO AUTISM}")
-        }
-
-        else {
-
-          const searchForPhrase = "Y = "
-          const pointOfY = data.queryResult.indexOf(searchForPhrase)
-          const severityLevel = parseInt(data.queryResult.substring(pointOfY + searchForPhrase.length, pointOfY + searchForPhrase.length + 1)) - 4
-          setResults("{SCREENING RESULTS: POSSIBLE AUTISM. SEVERITY LEVEL: " + severityLevel + "}")
-        }
-      }
+      console.log("john query: " + data.conditionStatus)
+      //if there was a query returned.
+      parseQueryResults(data.queryResult)
 
     } catch (error) {
       console.error("Error sending message:", error);
