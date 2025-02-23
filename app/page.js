@@ -20,7 +20,7 @@ const quickReplies = ["I'd like a screening" , "I think I have symptoms for auti
 export default function Home() {
   const [messages, setMessages] = useState([{
     role: "model",
-    parts: [{text: "Hello! I'm the MediCASP screening support assistant. How can I help you today? You can use the options below to get started. "}]
+    parts: [{text: "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started. "}]
   }]);
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
