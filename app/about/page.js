@@ -112,10 +112,23 @@ const About = () => {
                         Medical Conditions We Screen
                     </Typography>
                     <Grid container spacing={3}>
+                     {/* Medical Conditions Card ----------------------------------------------------------------------------------------------*/}
+                     <Grid item xs={12} md={6}>
+                            <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>Arthritis</Typography>
+                                <Typography variant="body2" sx={{ color: 'gray.700' }}>Joint pain assessment and early arthritis symptom screening.</Typography>
+                            </Paper>
+                        </Grid>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
                                 <Typography variant="h6" sx={{ color: '#00C850' }}>Autism Spectrum Disorder</Typography>
                                 <Typography variant="body2" sx={{ color: 'gray.700' }}>Early screening and detection of autism symptoms with detailed assessments.</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>COPD</Typography>
+                                <Typography variant="body2" sx={{ color: 'gray.700' }}>Assessment and screening for signs related to COPD.</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -126,26 +139,26 @@ const About = () => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
-                                <Typography variant="h6" sx={{ color: '#00C850' }}>Hypertension</Typography>
-                                <Typography variant="body2" sx={{ color: 'gray.700' }}>Blood pressure monitoring guidance and risk factor assessment.</Typography>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>Hypertension/Hypotension</Typography>
+                                <Typography variant="body2" sx={{ color: 'gray.700' }}>Guidance for blood pressure monitoring and risk factor assessment.</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
-                                <Typography variant="h6" sx={{ color: '#00C850' }}>Arthritis</Typography>
-                                <Typography variant="body2" sx={{ color: 'gray.700' }}>Joint pain assessment and early arthritis symptom screening.</Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
-                                <Typography variant="h6" sx={{ color: '#00C850' }}>Diabetes</Typography>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>Hypoglycemia</Typography>
                                 <Typography variant="body2" sx={{ color: 'gray.700' }}>Blood sugar management guidance and diabetes risk assessment.</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
-                                <Typography variant="h6" sx={{ color: '#00C850' }}>And more ...</Typography>
-                                <Typography variant="body2" sx={{ color: 'gray.700' }}>There will be more disabilties and diseases coming soon...</Typography>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>Pneumonia</Typography>
+                                <Typography variant="body2" sx={{ color: 'gray.700' }}>Screening guidance and risk factor assessment for pneumonia.</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Paper elevation={1} sx={{ p: 3, bgcolor: '#f5f5f5' }}>
+                                <Typography variant="h6" sx={{ color: '#00C850' }}>Coming Soon ...</Typography>
+                                <Typography variant="body2" sx={{ color: 'gray.700' }}>There will be more disabilties, diseases, and more coming soon...</Typography>
                             </Paper>
                         </Grid>
                     </Grid>
