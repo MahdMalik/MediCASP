@@ -23,21 +23,21 @@ import logo2 from '../public/logoV1.png'; // public pathway
 const logoColor = '#39FF14'; // This is green, dominant color in the logo
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#02023a', // Dark blue, also in the logo
-      contrastText: '#fff',  // White text for contrast
-    },
-    secondary: {
-      main: '#00C850',  // Lighter green, also in the logo
-      contrastText: '#000', // Black text for contrast
-    },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
-    },
+      primary: {
+          main: '#02023a', // Dark blue, also in the logo
+          contrastText: '#fff',  // White text for contrast
+      },
+      secondary: {
+          main: '#00C850',  // Lighter green, also in the logo
+          contrastText: '#000', // Black text for contrast
+      },
+      background: {
+          default: '#f5f5f5',
+          paper: '#ffffff',
+      },
   },
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+      fontFamily: 'Roboto, sans-serif',
   },
 });
 
@@ -54,18 +54,18 @@ export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
 
   useEffect(() => {
-    if (isLoaded) {
-      let initialGreeting = "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.";
+      if (isLoaded) {
+          let initialGreeting = "Hello! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.";
 
-      if (isSignedIn && user) {
-        initialGreeting = `Hello ${user.firstName || user.username || 'there'}! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.`;
+          if (isSignedIn && user) {
+              initialGreeting = `Hello ${user.firstName || user.username || 'there'}! I'm the MediCASP medical support assistant. How can I help you today? You can use the options below to get started.`;
+          }
+
+          setMessages([{
+              role: "model",
+              parts: [{ text: initialGreeting }]
+          }]);
       }
-
-      setMessages([{
-        role: "model",
-        parts: [{ text: initialGreeting }]
-      }]);
-    }
   }, [isLoaded, isSignedIn, user]);
 
   // Ref for the chat box
@@ -73,63 +73,82 @@ export default function Home() {
 
   // Auto-scroll logic
   const scrollToBottom = () => {
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop =
-        chatBoxRef.current.scrollHeight;
-    }
+      if (chatBoxRef.current) {
+          chatBoxRef.current.scrollTop =
+              chatBoxRef.current.scrollHeight;
+      }
   };
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
+      scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
-    if (showCoverPage) {
+  if (showCoverPage) {
       const timeoutId = setTimeout(() => {
-        // Fade out effect
-        let opacity = 1;
-        const fadeOutInterval = setInterval(() => {
-          opacity -= 0.05; // Adjust the fade speed here
-          setCoverPageOpacity(opacity);
-          if (opacity <= 0) {
-            clearInterval(fadeOutInterval);
-            setShowCoverPage(false); // Fully hide the cover page
-          }
-        }, 50); // Update opacity every 50ms
+          // Fade out effect
+          let opacity = 1;
+          const fadeOutInterval = setInterval(() => {
+              opacity -= 0.05; // Adjust the fade speed here
+              setCoverPageOpacity(opacity);
+              if (opacity <= 0) {
+                  clearInterval(fadeOutInterval);
+                  setShowCoverPage(false); // Fully hide the cover page
+              }
+          }, 50); // Update opacity every 50ms
       }, 1000); // Wait for 1 second before fading
       const handleKeyPress = () => setShowCoverPage(false); // Hide on keypress
       window.addEventListener('keydown', handleKeyPress);
       return () => {
-        clearTimeout(timeoutId);
-        window.removeEventListener('keydown', handleKeyPress);
+          clearTimeout(timeoutId);
+          window.removeEventListener('keydown', handleKeyPress);
       };
     }
     setCoverPageOpacity(1); // Reset opacity when cover page shows
   }, [showCoverPage]);
 
+  // Function to speak the text
+  const speak = (text) => {
+      if ('speechSynthesis' in window) {
+          const synth = window.speechSynthesis;
+          const utterance = new SpeechSynthesisUtterance(text);
+
+          // Configure speech (optional)
+          utterance.rate = 1;     // Speech speed (0.1 - 10)
+          utterance.pitch = 1;    // Speech pitch (0 - 2)
+          utterance.volume = 1;   // Volume (0 - 1)
+
+          synth.speak(utterance);
+      } else {
+          console.warn('Text-to-speech not supported in this browser.');
+      }
+  };
+
   const sendMessage = async () => {
-    console.log("Current line: " + addedResultLine)
-    if (!message.trim()) return;
+      console.log("Current line: " + addedResultLine)
+      if (!message.trim()) return;
 
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { role: "user", parts: [{ text: message }] },
-    ]);
-    setMessage('');
-    setIsTyping(true);
+      setMessages((prevMessages) => [
+          ...prevMessages,
+          { role: "user", parts: [{ text: message }] },
+      ]);
+      setMessage('');
+      setIsTyping(true);
 
-    try {
+      try {
       const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { 'Content-Type': "application/json" },
-        body: JSON.stringify([...messages, { role: "user", parts: [{ text: addedResultLine + "\n" + message }] }])
+          method: "POST",
+          headers: { 'Content-Type': "application/json" },
+          body: JSON.stringify([...messages, { role: "user", parts: [{ text: addedResultLine + "\n" + message }] }])
       });
       const data = await response.json();
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: "model", parts: [{ text: data.message }] }
-      ]);
+      const botResponse = { role: "model", parts: [{ text: data.message }] };
+      setMessages((prevMessages) => [...prevMessages, botResponse]);
+
+      // Speak the bot's response
+      speak(data.message);
+      
       if (data.autismStatus.indexOf("has_autism") == -1) {
         console.log("HELP IN GAIA")
       }
