@@ -126,3 +126,11 @@ has_major_ncd(X) :-
     no_other_mental_disorder(X),
     cognitive_decline(X, Count),
     geq(Count, 3).
+
+has_dementia(X, major) :-
+    has_major_ncd(X).
+
+has_dementia(X, minor) :-
+    has_minor_ncd(X).
+?- has_dementia([functional_impairment, no_delirium, no_other_mental_disorder, complex_attention, executive_function, learning_memory, language], Y).
+?- has_dementia([functional_impairment,  no_delirium, no_other_mental_disorder, complex_attention, executive_function, learning_memory, language], Y).
