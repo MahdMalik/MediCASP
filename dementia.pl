@@ -134,3 +134,7 @@ has_dementia(X, minor) :-
     has_minor_ncd(X).
 ?- has_dementia([functional_impairment, no_delirium, no_other_mental_disorder, complex_attention, executive_function, learning_memory, language], Y).
 ?- has_dementia([functional_impairment,  no_delirium, no_other_mental_disorder, complex_attention, executive_function, learning_memory, language], Y).
+?- has_dementia([functional_impairment, learning_memory(decline)], Y).
+?- has_dementia([functional_impairment],Y).
+?- has_dementia([functional_impairment, no_delirium, no_other_mental_disorder, complex_attention, executive_function, learning_memory, language], Y).
+?- has_dementia([functional_impairment, complex_attention, executive_function, learning_memory, language], Y).

@@ -81,6 +81,7 @@ export default function Home() {
         setDementiaResults("")
         for(const oneQuery of data.queryResult)
         {
+          console.log("query results: " + oneQuery)
           if(oneQuery.indexOf("no models") != -1)
           {
             setAutismResults("{SCREENING RESULTS: NO AUTISM}") 
