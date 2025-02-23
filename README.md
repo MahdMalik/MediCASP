@@ -1,3 +1,7 @@
+## MediCASP: Your AI-Powered Medical Screening Assistant
+
+MediCASP is an AI-powered medical screening assistant that combines medical knowledge and advanced reasoning to provide accessible preliminary health assessments across multiple conditions.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
