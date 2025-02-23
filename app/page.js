@@ -58,6 +58,7 @@ export default function Home() {
   const [hypertensionResultLine, setHypertensionResults] = useState("")
   const [hypoglycemiaResultLine, setHypoglycemiaResults] = useState("")
   const [pneumoniaResultLine, setPneumoniaResults] = useState("")
+  const [lastQuery, setLastQuery] = useState("")
 
   const { isSignedIn, user, isLoaded } = useUser();
 
@@ -258,9 +259,9 @@ export default function Home() {
     //try to get AI's response
     try {
       //reponse stores AIs' response.
-      const trueUserMessage = autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + 
+      const trueUserMessage = "CURRENT QUERIES: " + lastQuery + "\nQUERY RESULTS (if any): "  + autismResultLine + "\n" + dementiaResultLine + "\n" + arthritisResultLine + "\n" + 
         copdResultLine + "\n" + hypertensionResultLine + "\n" + hypoglycemiaResultLine + 
-        "\n" + pneumoniaResultLine + "\n" + message
+        "\n" + pneumoniaResultLine + "\n" + "USER MESSAGE: " + message
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 'Content-Type': "application/json" },
@@ -277,10 +278,10 @@ export default function Home() {
       const botResponse = { role: "model", parts: [{ text: data.message }] };
       //add the ai's message to the history
       setMessages((prevMessages) => [...prevMessages, botResponse]);
-
       // Speak the bot's response
       speak(data.message);
       console.log("john query: " + data.conditionStatus)
+      setLastQuery(data.conditionStatus)
       //if there was a query returned.
       parseQueryResults(data.queryResult)
 
