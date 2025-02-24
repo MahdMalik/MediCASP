@@ -62,6 +62,7 @@ export default function Home() {
   const [addedResultLine, setResults] = useState("");
   const [coverPageOpacity, setCoverPageOpacity] = useState(1);
   const [isListening, setIsListening] = useState(false); // State to manage listening status
+  
   //These variables store the results of our queries that we have sent out.
   const [autismResultLine, setAutismResults] = useState("")
   const [dementiaResultLine, setDementiaResults] = useState("")
