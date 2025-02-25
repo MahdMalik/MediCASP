@@ -1,4 +1,4 @@
-% This is the prolog program for which Autis(CASP) is based. 
+% This is the prolog program for Autism screening is based. 
 
 % BEGIN queries.
 
