@@ -1,3 +1,8 @@
+% This is the prolog program for Autism screening. 
+
+% BEGIN queries.
+
+% Custom member predicate.
 -member(Element, []).
 member(Element, [Element | T]).
 member(Element, [H | T]) :- member(Element, T).
