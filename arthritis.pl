@@ -1,3 +1,5 @@
+% This is the prolog program for Arthritis screening. 
+
 % BEGIN queries.
 
 % Custom member predicate.
