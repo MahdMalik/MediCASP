@@ -1,4 +1,4 @@
-% This is the prolog program for Autism screening. 
+% This is the prolog program for COPD screening. 
 
 % BEGIN queries.
 
