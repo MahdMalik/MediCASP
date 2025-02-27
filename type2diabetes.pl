@@ -1,3 +1,5 @@
+% This is the prolog program for Type 2 Diabetes screening.
+
 % BEGIN queries.
 
 % Custom member predicate.
