@@ -1,3 +1,5 @@
+% This is the prolog program for Hypoglycemia screening. 
+
 % BEGIN queries.
 
 % Custom member predicate.
