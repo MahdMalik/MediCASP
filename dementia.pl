@@ -1,3 +1,7 @@
+% This is the prolog program for Dementia screening. 
+
+% BEGIN queries.
+
 %--------------------------------------------------
 % List Membership
 %--------------------------------------------------
