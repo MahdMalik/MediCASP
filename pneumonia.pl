@@ -1,3 +1,8 @@
+% This is the prolog program for pneumonia screening. 
+
+% BEGIN queries.
+
+
 -member(Element, []).
 member(Element, [Element | T]).
 member(Element, [H | T]) :- member(Element, T).
