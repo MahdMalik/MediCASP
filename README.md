@@ -39,5 +39,17 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+For Python handler:
+Download Python (preferrably the latest version), then run in VS Code (or other IDE)
+
+For backend s(CASP):
+install ubuntu and then follow this link to install ciao and scasp
+
+https://gitlab.software.imdea.org/ciao-lang/sCASP
+GitLab
+ciao-lang / sCASP · GitLab
+GitLab Community Edition
+
+
 
 Click here or copy paste if other links don't work: https://medi-casp.vercel.app/
